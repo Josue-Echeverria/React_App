@@ -1,21 +1,23 @@
-import React from 'react';
-import NavButton from './navbutton';
+import { Link, NavLink } from "react-router-dom";
+import "./Navbar.css";
 
-function NavBar() {
-    
+function Navbar(){
+
   return (
-    <div> 
+    <nav>
+      <div class="dropdown">
+        <i class="fas fa-bars dropbtn"></i>
         
-        <NavButton title="Inicio"/>
-        <NavButton title="Organización"/>
-        <NavButton title="Laboratorios"/>
-        <NavButton title="Webmail"/>
-        <NavButton title="Foro"/>
-        <NavButton title="Alianza Microsoft"/>
-        <NavButton title="Sitio del ITCR"/>
-        <NavButton title="Contactenos"/>
-    </div>
+        <div class="dropdown-content">
+          <NavLink to="/order">Realizar pedido</NavLink>
+          <NavLink to="/consult">Consultar pedido</NavLink>
+        </div>
+      </div>
+      <Link to="/" className="title">
+        Website
+      </Link>
+  
+    </nav>
   );
-}
-
-export default NavBar;
+};
+export default Navbar;
