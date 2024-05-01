@@ -8,14 +8,14 @@ import { ConsultOrder, Home, Order } from "./components/pages/Index";
 
 function App() {
   return (
-    <div className="App">
-    <Navbar />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/ConsultOrder" element={<ConsultOrder />} />
-      <Route path="/Order" element={<Order />} />
-    </Routes>
-  </div>
+    <div className="App inter101" >
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/ConsultOrder" element={<ConsultOrder />} />
+        <Route path="/Order" element={<Order />} />
+      </Routes>
+    </div>
   );
 }
 

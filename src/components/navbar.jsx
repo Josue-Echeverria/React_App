@@ -10,7 +10,7 @@ function Navbar(){
         
         <div class="dropdown-content">
           <NavLink to="/order">Realizar pedido</NavLink>
-          <NavLink to="/consult">Consultar pedido</NavLink>
+          <NavLink to="/consultOrder">Consultar pedido</NavLink>
         </div>
       </div>
       <Link to="/" className="title">

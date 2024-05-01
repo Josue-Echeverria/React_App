@@ -2,6 +2,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family:  sans-serif;
-  font-size: 3vw;
+  font-family:Arial, Helvetica, sans-serif;
+}
+html {
+  scroll-padding-top: 5vh;
 }

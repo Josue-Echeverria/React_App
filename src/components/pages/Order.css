@@ -1,0 +1,48 @@
+
+input[type="text"] {
+  padding: 0;
+  height: 5vh;
+  position: relative;
+  left: 0;
+  border: 0px;
+  border-radius: 10px;
+  background-color: #b3b3b3;
+  box-shadow: 5px 5px 5px gray;
+}
+
+input[type="number"] {
+  padding: 0;
+  height: 5vh;
+  position: relative;
+  left: 0;
+  border: 0px;
+  border-radius: 10px;
+  background-color: rgb(179, 179, 179);
+  box-shadow: 5px 5px 5px gray;
+}
+
+label{
+  font-weight: bold;
+}
+
+#uploadFile {
+  display: flex;
+  height: 21vh;
+  width: 32vw;
+  align-items: center;
+  justify-content: center;
+  background-color: #b3b3b3;
+  border-radius: 18px;
+  box-shadow: 5px 5px 5px gray;
+}
+
+#orderQuestionary{
+    padding: 5vh 5vw;
+    margin: 0;
+    margin-top: 5vh;
+}
+
+.question{
+  display: flex;
+  flex-direction: column;
+}
