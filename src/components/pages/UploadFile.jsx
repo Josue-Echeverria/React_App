@@ -11,7 +11,7 @@ export const UploadFile = () => {
         if (!fileObj) {
           return;
         }
-        console.log('Selected file:', fileObj.name);
+        console.log('Selected file:', fileObj);
         event.target.value = null; 
       };
 
@@ -24,6 +24,7 @@ export const UploadFile = () => {
         type="file"
         onChange={handleFileChange}
       />
+      <img id="imgSRC" style = {{display:"none"}}/>
     </div>
   };
   

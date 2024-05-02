@@ -6,6 +6,7 @@
 
 nav {
     display: flex;
+    height: 9vh;
     justify-content: space-between;
     align-items: center;
     background-color: #0f172a;
@@ -46,12 +47,20 @@ nav ul li a:not(.active):hover {
 
 
 .dropbtn {
-    background-color: #04AA6D;
+
     color: white;
     padding: 5vw;
     border: none;
   }
   
+
+.backbtn {
+    color: white;
+    padding: 5vw;
+    border: none;
+}
+
+
 .dropdown {
     position: relative;
     display:inline-block;

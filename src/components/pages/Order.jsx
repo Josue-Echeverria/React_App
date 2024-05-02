@@ -17,27 +17,26 @@ export const Order = () => {
     <div className="question">
       <label>Diseño: </label><br/>
       <UploadFile/>
-      <br/>
     </div>
 
     <div className="question">
       <label>Nombre: </label>
-      <input type="text" id="name" required/><br/>
+      <input type="text" id="name" required/>
     </div>
 
     <div className="question">
       <label>Número de teléfono:</label>
-      <input type="number" id="phone" required/><br/>     
+      <input type="number" id="phone" required/>    
     </div>
 
-    <div className="question">      
+    <div className="question">   
       <label>Dirección:</label>
-      <input type="text" id="direction" required/><br/>
+      <input type="text" id="direction" required/>
     </div>
 
     <div className="question">
       <label>Cantidad:</label>
-      <input type="number" id="quantity" required/><br/><br/> 
+      <input type="number" id="quantity" max={"20"} min={"1"}required/>
     </div>
 
     <div className="question">
@@ -48,13 +47,25 @@ export const Order = () => {
     </div>
 
     <div className="question">
-      <label>Total a pagar:</label>
-      <input type="number" id="total" required/><br/><br/> 
-      <label>Primer pago:</label>
-      <input type="number" id="first_half" required/><br/><br/> 
-      <label>Primer pago:</label>
-      <input type="number" id="first_half" required/><br/><br/> 
+      <div className="payment">
+          <label>Total a pagar:</label>
+          <p id="total"></p> 
+      </div>
     </div>
+    <div className="question">
+      <div className="payment">
+        <label>Primer pago:</label>
+        <p id="firstHalf"></p> 
+      </div> 
+      <UploadFile/>
+    </div>
+    <div className="question">
+      <div className="payment">
+        <label>Segundo pago:</label>
+        <p id="secondHalf"></p>  
+      </div>
+      <UploadFile/>
+  </div>
     
     <button id = "sendOrder" >Enviar</button>
   </div>

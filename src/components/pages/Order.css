@@ -1,7 +1,16 @@
+#orderQuestionary{
+  padding: 5vh 5vw;
+  overflow: scroll;
+  position:fixed;
+  height: 80%;
+  width: 90%;
+}
+
 
 input[type="text"] {
-  padding: 0;
-  height: 5vh;
+  font-size: 4vw;
+  padding: 2vw;
+  height: 6vh;
   position: relative;
   left: 0;
   border: 0px;
@@ -11,8 +20,9 @@ input[type="text"] {
 }
 
 input[type="number"] {
-  padding: 0;
-  height: 5vh;
+  font-size: 4vw;
+  padding: 2vw;
+  height: 6vh;
   position: relative;
   left: 0;
   border: 0px;
@@ -26,23 +36,37 @@ label{
 }
 
 #uploadFile {
-  display: flex;
-  height: 21vh;
-  width: 32vw;
+  display: grid;
+  height: 30vh;
+  width: 45vw;
   align-items: center;
   justify-content: center;
   background-color: #b3b3b3;
   border-radius: 18px;
   box-shadow: 5px 5px 5px gray;
-}
-
-#orderQuestionary{
-    padding: 5vh 5vw;
-    margin: 0;
-    margin-top: 5vh;
+  align-content: center;
+  overflow:visible;
 }
 
 .question{
+  border-top: solid rgba(0, 0, 0, 0.106);
+  display: grid;
+  margin-bottom: 3vh;
+  padding-top: 3vh;
+}
+
+.payment{
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.payment p{
+  text-align: right;
+}
+
+#sendOrder{
+  width: 95%;
+  background-color: rgb(184, 246, 123);
 }
