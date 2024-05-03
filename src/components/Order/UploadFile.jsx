@@ -1,4 +1,4 @@
-import React, { PropTypes, Component, useRef } from 'react'
+import React, { useRef } from 'react'
 
 
 export const UploadFile = () => {
