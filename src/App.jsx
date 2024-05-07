@@ -7,6 +7,7 @@ import { ConsultOrder, Home, Order } from "./components/Index";
 
 
 function App() {
+
   return (
     <div className="App inter101" >
       <Navbar />

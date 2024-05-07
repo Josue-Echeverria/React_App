@@ -48,6 +48,12 @@ label{
   overflow:visible;
 }
 
+img{
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+}
+
 .question{
   border-top: solid rgba(0, 0, 0, 0.106);
   display: grid;
@@ -66,7 +72,35 @@ label{
   text-align: right;
 }
 
+.info{
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+
 #calculatePrice{
   width: 95%;
   background-color: rgb(184, 246, 123);
+  display: none;
+  justify-content: center;
+}
+
+#totalPaymentDiv{
+  display: none;
+}
+#firstPaymentDiv{
+  display: none;
+}
+#secondPaymentDiv{
+  display: none;
+}
+#sendOrderBtn{
+  width: 95%;
+  background-color: rgb(184, 246, 123);
+  display: none;
+  margin-top: 3vh;
+  justify-content: center;
+}
+#unitLabel{
+  display: none;
 }

@@ -14,6 +14,10 @@ export const Unit = (props) => {
         actualSize.textContent = e.target.textContent
     }
 
+    /**
+     * 
+     * @param {*} e  
+     */
     function handleButtonNeckClick(e){
         const buttonsDiv = document.querySelector(`#unit${props.unitNumber}neckTypeButtons`).getElementsByTagName('button')
         const buttonsDivLength = buttonsDiv.length
@@ -52,7 +56,7 @@ export const Unit = (props) => {
     </div>
     <div id="detailDiv">
         <label>Detalle:</label>
-        <input type="text" id="detail" required/>
+        <input type="text" id={`unit${props.unitNumber}Detail`}/>
     </div>
     <p style={{display:"none"}} id={`unit${props.unitNumber}Size`}></p>
     <p style={{display:"none"}} id={`unit${props.unitNumber}NeckType`}></p>
