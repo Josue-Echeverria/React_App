@@ -9,6 +9,12 @@ const KID_SIZES = ["16","14","12","10","8"]
 const ADULT_PRICE = 5000
 const KID_PRICE = 4000
 
+const request = new Request("http://localhost:3001/api", {
+  method: "GET",
+  headers: {
+    'accept': 'application/json'
+}
+});
 
 export const Order = () => {
   // const [data, setData] = React.useState(null);
@@ -85,6 +91,7 @@ export const Order = () => {
     return price
   }
 
+
   function displayPrices(){
     const totalPrice = calculatePrice()
     if(totalPrice === null)
@@ -123,15 +130,25 @@ export const Order = () => {
     if(unitsInfo === null)
       return null
     
-    // let response = await fetch("/api");//Se sacan los datos del  archivo articulo 
-    // alert(response)
-    // console.log(response)
+    let response = await fetch(request);
+    let data = await response.json();
+    console.log(data)
+
+    // fetch(request)
+    //   .then(res => {
+    //     if (res.status === 200) {
+    //       return res.json()
+    //     }
+    //   }).catch(error => {
+    //     console.log(error);
+    //   });
 
     console.log(name)
     console.log(direction)
     console.log(quantity)
     console.log(phone)
   }
+
 
   return <div id="orderQuestionary">
     <div className="question">
