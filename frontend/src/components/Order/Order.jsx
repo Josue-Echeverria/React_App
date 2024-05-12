@@ -9,12 +9,6 @@ const KID_SIZES = ["16","14","12","10","8"]
 const ADULT_PRICE = 5000
 const KID_PRICE = 4000
 
-const request = new Request("http://localhost:3001/api", {
-  method: "GET",
-  headers: {
-    'accept': 'application/json'
-}
-});
 
 export const Order = () => {
   // const [data, setData] = React.useState(null);
@@ -75,8 +69,7 @@ export const Order = () => {
   }
 
   
-  function calculatePrice(){
-    const unitsInfo = getUnitsInfo() 
+  function calculatePrice(unitsInfo = getUnitsInfo()){
     if(unitsInfo === null)
       return null
     let price = 0
@@ -114,39 +107,40 @@ export const Order = () => {
       alert("Por favor especifique el diseño que desea al inicio del cuestionario")
       return;
     }
+    design = design.src
     let phone = document.querySelector("#phone").value
     let name = document.querySelector("#name").value
     let direction = document.querySelector("#direction").value
     let quantity = document.querySelector("#quantity").value
+    let total = document.querySelector("#total").textContent
 
     let firstPaymentImg = document.querySelector("#firstPaymentImg")
     if(firstPaymentImg === null){
       alert("Por favor suba la imagen del comprobante de transeferencia o pago por sinpe del primer pago")
       return;
     }
-
+    firstPaymentImg = firstPaymentImg.src
     let secondPaymentImg = document.querySelector("#secondPaymentImg")
+    if(secondPaymentImg !== null){
+      secondPaymentImg = secondPaymentImg.src
+    }
     let unitsInfo = getUnitsInfo()
     if(unitsInfo === null)
       return null
     
+
+    const data = { name, phone, direction, quantity, unitsInfo, total, design, firstPaymentImg, secondPaymentImg};
+    
+    const request = new Request("http://localhost:3001/order", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
     let response = await fetch(request);
-    let data = await response.json();
-    console.log(data)
-
-    // fetch(request)
-    //   .then(res => {
-    //     if (res.status === 200) {
-    //       return res.json()
-    //     }
-    //   }).catch(error => {
-    //     console.log(error);
-    //   });
-
-    console.log(name)
-    console.log(direction)
-    console.log(quantity)
-    console.log(phone)
+    window.location.replace(`http://localhost:3000/consult/${phone}`)
   }
 
 
