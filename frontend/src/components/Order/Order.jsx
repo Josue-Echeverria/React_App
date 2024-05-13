@@ -138,9 +138,8 @@ export const Order = () => {
       },
       body: JSON.stringify(data),
     });
-
     let response = await fetch(request);
-    window.location.replace(`http://localhost:3000/consult/${phone}`)
+    // window.location.replace(`http://localhost:3000/consult/${phone}`)
   }
 
 

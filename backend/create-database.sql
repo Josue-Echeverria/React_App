@@ -12,6 +12,14 @@ CREATE TABLE [dbo].[user] (
     CONSTRAINT [PK_user] PRIMARY KEY CLUSTERED ([id] ASC)
 );
 
+CREATE TABLE [dbo].[client] (
+    [id]        INT IDENTITY(1,1) NOT NULL,
+    [name]      VARCHAR (64)  NOT NULL,
+    [phone]     VARCHAR (16)  NOT NULL,
+    [direction] VARCHAR (128) NOT NULL,
+    CONSTRAINT [PK_client] PRIMARY KEY CLUSTERED ([id] ASC),
+);
+
 CREATE TABLE [dbo].[state] (
     [id]   INT IDENTITY(1,1) NOT NULL,
     [name] VARCHAR (16) NOT NULL,
@@ -32,33 +40,63 @@ CREATE TABLE [dbo].[neckType] (
 
 CREATE TABLE [dbo].[image] (
     [id]    INT IDENTITY(1,1) NOT NULL,
-    [image] VARBINARY (MAX) NOT NULL,
+    [image] VARCHAR (MAX) NOT NULL,
+	[idClient] [int] NOT NULL,
+	[date] [date] NOT NULL,
     CONSTRAINT [PK_image] PRIMARY KEY CLUSTERED ([id] ASC)
 );
 
-CREATE TABLE [dbo].[order] (
-    [id]                 INT      IDENTITY (1, 1) NOT NULL,
-    [date]               DATE     NOT NULL,
-    [idClient]           INT      NOT NULL,
-    [idImgDesign]        INT      NOT NULL,
-    [quantity]           SMALLINT NOT NULL,
-    [total]              MONEY    NOT NULL,
-    [idImgFirstPayment]  INT      NOT NULL,
-    [idImgSecondPayment] INT      NOT NULL,
-    [idState]            INT      NOT NULL,
-    CONSTRAINT [PK_order] PRIMARY KEY CLUSTERED ([id] ASC),
-    CONSTRAINT [FK_order_client] FOREIGN KEY ([idClient]) REFERENCES [dbo].[client] ([id]),
-    CONSTRAINT [FK_order_image_design] FOREIGN KEY ([idImgDesign]) REFERENCES [dbo].[image] ([id]),
-    CONSTRAINT [FK_order_image_first_payment] FOREIGN KEY ([idImgFirstPayment]) REFERENCES [dbo].[image] ([id]),
-    CONSTRAINT [FK_order_state] FOREIGN KEY ([idState]) REFERENCES [dbo].[state] ([id])
-);
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[order](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[date] [date] NOT NULL,
+	[idClient] [int] NOT NULL,
+	[idImgDesign] [int] NOT NULL,
+	[quantity] [smallint] NOT NULL,
+	[total] [money] NOT NULL,
+	[idImgFirstPayment] [int] NOT NULL,
+	[idImgSecondPayment] [int] NULL,
+	[idState] [int] NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[order] ADD  CONSTRAINT [PK_order] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[order]  WITH CHECK ADD  CONSTRAINT [FK_order_client] FOREIGN KEY([idClient])
+REFERENCES [dbo].[client] ([id])
+GO
+ALTER TABLE [dbo].[order] CHECK CONSTRAINT [FK_order_client]
+GO
+ALTER TABLE [dbo].[order]  WITH CHECK ADD  CONSTRAINT [FK_order_image_design] FOREIGN KEY([idImgDesign])
+REFERENCES [dbo].[image] ([id])
+GO
+ALTER TABLE [dbo].[order] CHECK CONSTRAINT [FK_order_image_design]
+GO
+ALTER TABLE [dbo].[order]  WITH CHECK ADD  CONSTRAINT [FK_order_image_first_payment] FOREIGN KEY([idImgFirstPayment])
+REFERENCES [dbo].[image] ([id])
+GO
+ALTER TABLE [dbo].[order] CHECK CONSTRAINT [FK_order_image_first_payment]
+GO
+ALTER TABLE [dbo].[order]  WITH CHECK ADD  CONSTRAINT [FK_order_state] FOREIGN KEY([idState])
+REFERENCES [dbo].[state] ([id])
+GO
+ALTER TABLE [dbo].[order] CHECK CONSTRAINT [FK_order_state]
+GO
 
+
+GO
 CREATE TABLE [dbo].[unit] (
     [id]          INT           IDENTITY (1, 1) NOT NULL,
     [idOrder]     INT           NOT NULL,
     [idSize]      INT           NOT NULL,
     [idNeckType]  INT           NOT NULL,
-    [description] VARCHAR (256) NOT NULL,
+    [description] VARCHAR (256) NULL,
     [idState]     INT           NOT NULL,
     CONSTRAINT [PK_unit] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_unit_neckType] FOREIGN KEY ([idNeckType]) REFERENCES [dbo].[neckType] ([id]),
@@ -67,14 +105,6 @@ CREATE TABLE [dbo].[unit] (
     CONSTRAINT [FK_unit_state] FOREIGN KEY ([idState]) REFERENCES [dbo].[state] ([id])
 );
 
-
-CREATE TABLE [dbo].[client] (
-    [id]        INT IDENTITY(1,1) NOT NULL,
-    [name]      VARCHAR (64)  NOT NULL,
-    [phone]     VARCHAR (16)  NOT NULL,
-    [direction] VARCHAR (128) NOT NULL,
-    CONSTRAINT [PK_client] PRIMARY KEY CLUSTERED ([id] ASC),
-);
 
 CREATE TABLE [dbo].[stateChangeOrder] (
     [id]              INT IDENTITY(1,1) NOT NULL,
@@ -108,6 +138,8 @@ VALUES ('Cuello redondo'),('Cuello V'),('Cuello polo');
 INSERT INTO [dbo].[size] ([name])
 VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
 
+INSERT INTO [dbo].[state] ([name])
+VALUES ('En fabricación');
 
 GO
 CREATE PROCEDURE [dbo].[create_order]
@@ -117,9 +149,9 @@ CREATE PROCEDURE [dbo].[create_order]
     , @inQuantity INT
     , @inUnit NVARCHAR(MAX)
     , @inTotal MONEY
-    , @inImgDesign VARBINARY (MAX)
-    , @inImgFirstPayment VARBINARY (MAX)
-    , @inImgSecondPayment VARBINARY (MAX)
+    , @inImgDesign VARCHAR (MAX)
+    , @inImgFirstPayment VARCHAR (MAX)
+    , @inImgSecondPayment VARCHAR (MAX)
 	, @outResultCode INT OUTPUT
 AS
 BEGIN
@@ -173,6 +205,7 @@ BEGIN
 SET NOCOUNT OFF;
 END;
 GO
+
 CREATE PROCEDURE [dbo].[read_orders]
 	@outResultCode INT OUTPUT
     , @inPhone VARCHAR(16)
@@ -185,16 +218,61 @@ SET NOCOUNT ON;
     FROM dbo.client a 
     WHERE a.phone = @inPhone;
 	
-    SELECT a.date, b.image, a.quantity, a.total, c.name 
+    SELECT a.date, b.image, a.id, c.name, a.total
     FROM dbo.[order] a
     INNER JOIN dbo.image b ON b.id = a.idImgDesign 
     INNER JOIN dbo.state c ON c.id = a.idState 
-    WHERE a.idClient = @idClient
+    WHERE a.idClient = @idClient;
 
-    SET @outResultCode=0
+    SET @outResultCode=0;
+
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_order_by_id]
+	@outResultCode INT OUTPUT
+    , @inIdOrder VARCHAR(16)
+AS
+BEGIN
+SET NOCOUNT ON;
+    SELECT a.name, a.direction, c.[image], d.[image]
+    FROM dbo.[order] o
+    INNER JOIN dbo.client a ON a.id = o.idClient
+    INNER JOIN dbo.[image] c ON c.id = o.idImgFirstPayment
+    INNER JOIN dbo.[image] d ON d.id = o.idImgSecondPayment
+    WHERE o.id = @inIdOrder
+
+    SET @outResultCode=0;
+
+SET NOCOUNT OFF;
+END;
+
+
+
+GO
+
+CREATE PROCEDURE [dbo].[read_units_by_order_id]
+	@outResultCode INT OUTPUT
+    , @inIdOrder VARCHAR(16)
+AS
+BEGIN
+SET NOCOUNT ON;
+    SELECT a.name, b.name, u.[description], d.name
+    FROM dbo.[unit] u
+    INNER JOIN dbo.[size] a ON a.id = u.idSize
+    INNER JOIN dbo.neckType b ON b.id = u.idNeckType
+    INNER JOIN dbo.[state] d ON d.id = u.idState
+    WHERE u.idOrder = @inIdOrder
+
+    SET @outResultCode=0;
 
 SET NOCOUNT OFF;
 END;
 GO
+GO
+
+
 
 

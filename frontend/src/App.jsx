@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import "./App.css";
-import { Consult, Home, Order } from "./components/Index";
+import { OrderList, Home, Order } from "./components/Index";
 
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/Consult/:phone" element={<Consult />} />
+        <Route path="/Consult/:phone" element={<OrderList />} />
         <Route path="/Order" element={<Order />} />
       </Routes>
     </div>

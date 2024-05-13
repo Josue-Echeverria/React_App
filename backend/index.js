@@ -35,6 +35,7 @@ app.post("/order", async (req, res) => {
     await sql.connect(config);
     const request = new sql.Request();
 
+    // console.log(design)
     request.output('outResultCode', sql.Int);
     request.input('inName', sql.VarChar(64), name);
     request.input('inPhone', sql.VarChar(16), phone);
@@ -42,9 +43,9 @@ app.post("/order", async (req, res) => {
     request.input('inQuantity', sql.Int, quantity);
     request.input('inUnit', sql.NVARCHAR(sql.MAX), JSON.stringify(unitsInfo));
     request.input('inTotal', sql.Money, total);
-    request.input('inImgDesign', sql.VARBINARY(sql.MAX), new Buffer.from(design));
-    request.input('inImgFirstPayment', sql.VARBINARY(sql.MAX), new Buffer.from(firstPaymentImg));
-    request.input('inImgSecondPayment', sql.VARBINARY(sql.MAX), secondPaymentImg);
+    request.input('inImgDesign', sql.VarChar(sql.MAX), design);
+    request.input('inImgFirstPayment', sql.VarChar(sql.MAX), firstPaymentImg);
+    request.input('inImgSecondPayment', sql.VarChar(sql.MAX), secondPaymentImg);
 
     const result = await request.execute('create_order');
     if(result.output.outResultCode !== null)
@@ -72,9 +73,8 @@ app.get("/order/:phone", async (req, res) => {
     request.input('inPhone', sql.VarChar(16), phone);
     
     const result = await request.execute('read_orders');
-    console.log(result.recordset)
+    // console.log(result.recordset)
 
-   
     res.json(result.recordset);
   } 
   catch (error) {
