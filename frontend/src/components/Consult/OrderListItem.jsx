@@ -1,14 +1,14 @@
 import React from "react";
 import "./OrderListItem.css"
-import { Buffer } from 'buffer';
 export const OrderListItem = (props) => {
     function getOrder(){
+        window.location.replace(`http://localhost:3000/consult/${props.phone}/${props.code}`)
 
     }
     return <div id= "orderListItem" onClick={getOrder}>
         <p className="info" id="date">{props.date}</p>
         <div id="order">
-        <img src={props.image} alt="My Image"></img>
+        <img src={props.image} alt="Design"></img>
         <div id="info">
             <div className="data" id="total">
                 <label>Monto pendiente:</label>

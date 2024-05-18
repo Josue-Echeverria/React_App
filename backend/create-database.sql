@@ -206,7 +206,7 @@ SET NOCOUNT OFF;
 END;
 GO
 
-CREATE PROCEDURE [dbo].[read_orders]
+CREATE PROCEDURE [dbo].[read_orders_by_phone]
 	@outResultCode INT OUTPUT
     , @inPhone VARCHAR(16)
 AS
@@ -230,47 +230,68 @@ SET NOCOUNT OFF;
 END;
 
 GO
-
 CREATE PROCEDURE [dbo].[read_order_by_id]
 	@outResultCode INT OUTPUT
-    , @inIdOrder VARCHAR(16)
+    , @inId INT
 AS
 BEGIN
 SET NOCOUNT ON;
-    SELECT a.name, a.direction, c.[image], d.[image]
+    SELECT o.[date]
+    , a.name
+    , a.phone
+    , a.direction
+    , o.quantity
+    , o.total
+    , o.idImgDesign
+    , o.idImgFirstPayment
+    , o.idImgSecondPayment
     FROM dbo.[order] o
     INNER JOIN dbo.client a ON a.id = o.idClient
-    INNER JOIN dbo.[image] c ON c.id = o.idImgFirstPayment
-    INNER JOIN dbo.[image] d ON d.id = o.idImgSecondPayment
-    WHERE o.id = @inIdOrder
+    INNER JOIN dbo.client b ON b.id = o.idState
+    WHERE o.id = @inId;
 
     SET @outResultCode=0;
 
 SET NOCOUNT OFF;
 END;
 
-
-
 GO
+
 
 CREATE PROCEDURE [dbo].[read_units_by_order_id]
 	@outResultCode INT OUTPUT
-    , @inIdOrder VARCHAR(16)
+    , @inId VARCHAR(16)
 AS
 BEGIN
 SET NOCOUNT ON;
-    SELECT a.name, b.name, u.[description], d.name
+    SELECT a.name AS size, b.name AS neckType, u.[description], d.name AS state
     FROM dbo.[unit] u
     INNER JOIN dbo.[size] a ON a.id = u.idSize
     INNER JOIN dbo.neckType b ON b.id = u.idNeckType
     INNER JOIN dbo.[state] d ON d.id = u.idState
-    WHERE u.idOrder = @inIdOrder
+    WHERE u.idOrder = @inId
 
     SET @outResultCode=0;
 
 SET NOCOUNT OFF;
 END;
 GO
+
+CREATE PROCEDURE [dbo].[read_image_by_id]
+	@outResultCode INT OUTPUT
+    , @inId VARCHAR(16)
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    SELECT [image]
+    FROM dbo.[image]
+    WHERE id = @inId
+
+    SET @outResultCode=0;
+
+SET NOCOUNT OFF;
+END;
 GO
 
 

@@ -1,4 +1,4 @@
-#orderQuestionary{
+.scrollable{
   padding: 5vh 5vw;
   overflow: scroll;
   position:fixed;
@@ -6,20 +6,7 @@
   width: 90%;
 }
 
-
-input[type="text"] {
-  font-size: 4vw;
-  padding: 2vw;
-  height: 6vh;
-  position: relative;
-  left: 0;
-  border: 0px;
-  border-radius: 10px;
-  background-color: #b3b3b3;
-  box-shadow: 5px 5px 5px gray;
-}
-
-input[type="number"] {
+input{
   font-size: 4vw;
   padding: 2vw;
   height: 6vh;
@@ -35,14 +22,17 @@ label{
   font-weight: bold;
 }
 
-#uploadFile {
-  display: grid;
+.imgDiv{
   height: 30vh;
   width: 45vw;
+  border-radius: 18px;
+}
+
+#uploadFile {
+  display: grid;
   align-items: center;
   justify-content: center;
   background-color: #b3b3b3;
-  border-radius: 18px;
   box-shadow: 5px 5px 5px gray;
   align-content: center;
   overflow:visible;

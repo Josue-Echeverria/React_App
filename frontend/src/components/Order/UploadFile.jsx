@@ -29,10 +29,10 @@ export const UploadFile = (props) => {
   };
 
 
-  return <div id="uploadFile" onClick={handleClick} >
+  return <div id="uploadFile" className="imgDiv" onClick={handleClick} >
     <i class="fa-solid fa-plus" id={`plusIcon${props.fileName}`}></i>
     <input style={{ display: 'none' }} ref={inputRef} type="file" onChange={handleFileChange}/>
-    {imageSrc && <img src={imageSrc} id={props.fileName} alt="Uploaded Image" />}
+    {imageSrc && <img src={imageSrc} id={props.fileName} alt="Uploaded" />}
   </div>
   };
   

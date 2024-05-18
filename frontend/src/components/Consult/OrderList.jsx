@@ -10,7 +10,7 @@ export const OrderList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/order/${phone}`);
+        const response = await fetch(`http://localhost:3001/orders/${phone}`);
         const jsonData = await response.json();
         setData(jsonData); // Set the fetched data in state
       } catch (error) {
@@ -21,15 +21,19 @@ export const OrderList = () => {
     fetchData(); // Call the async function
   }, [phone]); // Dependency array ensures it runs when 'phone' changes
 
-
-
   
   return <div>
-      {/* Use 'data' to render your component */}
       {data && (
         <ul>
           {data.map((item) => (
-            <OrderListItem key={item.id} code={item.id} date={item.date.substring(0, 10)} image={item.image} total={item.total} state={item.name}/>
+            <OrderListItem key={item.id} 
+            phone={phone}
+            code={item.id} 
+            date={item.date.substring(0, 10)} 
+            image={item.image} total={item.total} 
+            state={item.name} 
+            idImgFirstPayment={item.idImgFirstPayment}
+            idImgSecondPayment={item.idImgSecondPayment}/>
           ))}
         </ul>
       )}

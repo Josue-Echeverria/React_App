@@ -128,7 +128,6 @@ export const Order = () => {
     if(unitsInfo === null)
       return null
     
-
     const data = { name, phone, direction, quantity, unitsInfo, total, design, firstPaymentImg, secondPaymentImg};
     
     const request = new Request("http://localhost:3001/order", {
@@ -139,11 +138,14 @@ export const Order = () => {
       body: JSON.stringify(data),
     });
     let response = await fetch(request);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
     // window.location.replace(`http://localhost:3000/consult/${phone}`)
   }
 
 
-  return <div id="orderQuestionary">
+  return <div className="scrollable">
     <div className="question">
       <label>Diseño: </label><br/>
       <UploadFile fileName="designImg"/>
@@ -158,7 +160,6 @@ export const Order = () => {
       <label>Número de teléfono:</label>
       <input type="number" id="phone" required/>    
       <p className="info">Por favor digitar sin espacios ni guiones </p>  
-
     </div>
 
     <div className="question">   
@@ -172,12 +173,10 @@ export const Order = () => {
     </div>
 
     <div className="question">
-      
       <div id="units"></div>
     </div>
     <button id = "calculatePrice" onClick={displayPrices}>Calcular precio</button>
 
-    
     <div className="question payment" id="totalPaymentDiv">
       <label>Total a pagar:</label>
       <p id="total"></p> 
