@@ -17,17 +17,6 @@ button{
     border-top: solid rgba(0, 0, 0, 0.143);
 }
 
-input[type="text"] {
-  font-size: 4vw;
-  padding: 2vw;
-  height: 6vh;
-  position: relative;
-  left: 0;
-  border: 0px;
-  border-radius: 10px;
-  background-color: #b3b3b3;
-  box-shadow: 5px 5px 5px gray;
-}
 #detailDiv{
     display: grid;
     margin-bottom: 3vh;

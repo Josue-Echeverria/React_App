@@ -23,9 +23,19 @@ label{
 }
 
 .imgDiv{
-  height: 30vh;
-  width: 45vw;
+  height: 46vh;
+  width: 90vw;
   border-radius: 18px;
+  object-fit: cover;
+}
+
+.imgDiv img{
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  overflow: hidden;
 }
 
 #uploadFile {
@@ -35,14 +45,8 @@ label{
   background-color: #b3b3b3;
   box-shadow: 5px 5px 5px gray;
   align-content: center;
-  overflow:visible;
 }
 
-img{
-  max-width: 100%;
-  max-height: 100%;
-  height: auto;
-}
 
 .question{
   border-top: solid rgba(0, 0, 0, 0.106);

@@ -11,7 +11,6 @@ const KID_PRICE = 4000
 
 
 export const Order = () => {
-  // const [data, setData] = React.useState(null);
   let unitsRoot = ""
 
   /**
@@ -33,6 +32,7 @@ export const Order = () => {
     unitsRoot.render(
       units
     );
+    // Hides the payment inputs
     if(e.target.value > 0){
       document.querySelector("#calculatePrice").style.display = "flex"
       document.querySelector("#totalPaymentDiv").style.display = "none"
@@ -42,7 +42,11 @@ export const Order = () => {
     }
   }
 
-
+  /** 
+   * @description Collects the information from the page and stores all the units in an array to the return it
+   * 
+   * @returns All the information(Size, neckType) necesary for each unit specified by the client
+   */
   function getUnitsInfo(){
     let quantity = document.querySelector("#quantity").value
     let unitSize
@@ -50,7 +54,9 @@ export const Order = () => {
     let unitDetail
     let unitsInfo = []
 
-    // Confirm that all the units have the necktype and size especified
+    // For each unit that the client wants
+    // Confirm that the necktype and size have been especified
+    // The store the unit
     for(let i = 1; i<= quantity; i++){
       unitSize = document.querySelector(`#unit${i}Size`).textContent
       if(unitSize === ""){
@@ -62,20 +68,32 @@ export const Order = () => {
         alert(`Por favor especifique el tipo de cuello de la unidad ${i}`)
         return null
       }
-      unitDetail = document.querySelector(`#unit${i}Detail`).textContent
-      unitsInfo.push({"size":unitSize, "neckType":unitNeckType, "unitDetail":unitDetail})
+      unitDetail = document.querySelector(`#unit${i}Detail`).value
+      // After collecting all the info(Size, neckType, description)
+      // The unit is pushed into the array of units
+      unitsInfo.push({"size":unitSize, "neckType":unitNeckType, "detail":unitDetail})
     }
     return unitsInfo
   }
 
-  
+  /**
+   * @param {Array} unitsInfo All the units information(size, neckType, detail) provided by the client
+   * 
+   * @returns The cost based on the sizes of the units
+   */
   function calculatePrice(unitsInfo = getUnitsInfo()){
+    // (Means that some information from the units is missing)
     if(unitsInfo === null)
       return null
     let price = 0
+    // For each unit
     for(let i = 0; i<unitsInfo.length; i++){
+      // If the unit is adult size 
+      // Charge ADULT_PRICE
       if(ADULT_SIZES.includes(unitsInfo[i]["size"]))
         price+=ADULT_PRICE
+      // If the unit is kid size 
+      // Charge KID_PRICE
       else if(KID_SIZES.includes(unitsInfo[i]["size"]))
         price+=KID_PRICE
       else
@@ -84,9 +102,15 @@ export const Order = () => {
     return price
   }
 
-
+  /**
+   * @description Displays in the page the total price and what the client should pay in the first and second payment
+   * 
+   * @returns null in case the specification of a unit is missing
+   */
   function displayPrices(){
+    // totalPrice null means that the client haven't especified all the units information
     const totalPrice = calculatePrice()
+    // So it can't display the price because it sould be calculated based on the sizes
     if(totalPrice === null)
       return null
 
@@ -100,9 +124,14 @@ export const Order = () => {
     document.querySelector("#calculatePrice").style.display = "none"
   }
 
-
+  /**
+   * @description Checks if all the inputs have been filled to then send the order(all the information) to the backend 
+   * 
+   * @returns undefined in case an input is empty
+   */
   async function sendOrder(){  
     let design = document.querySelector("#designImg")
+    // If the client hasn't uploaded the design they want
     if(design === null){
       alert("Por favor especifique el diseño que desea al inicio del cuestionario")
       return;
@@ -115,21 +144,36 @@ export const Order = () => {
     let total = document.querySelector("#total").textContent
 
     let firstPaymentImg = document.querySelector("#firstPaymentImg")
+    // If the client hasn't uploaded the bill of the first payment
     if(firstPaymentImg === null){
       alert("Por favor suba la imagen del comprobante de transeferencia o pago por sinpe del primer pago")
       return;
     }
     firstPaymentImg = firstPaymentImg.src
+
     let secondPaymentImg = document.querySelector("#secondPaymentImg")
+    // If the client uploaded the bill of the second payment
+    // Since it is not necesary to pay everything at once, there is no alert
     if(secondPaymentImg !== null){
       secondPaymentImg = secondPaymentImg.src
     }
+
     let unitsInfo = getUnitsInfo()
+    // If the units info is null
+    // Means that the client hasn't specified the size or neck type ofa unit
     if(unitsInfo === null)
-      return null
+      return
     
-    const data = { name, phone, direction, quantity, unitsInfo, total, design, firstPaymentImg, secondPaymentImg};
-    
+    const data = { name
+      , phone
+      , direction
+      , quantity
+      , unitsInfo
+      , total
+      , design
+      , firstPaymentImg
+      , secondPaymentImg};
+    // Request to the backend sending all the order data as the body
     const request = new Request("http://localhost:3001/order", {
       method: "POST",
       headers: {
@@ -141,9 +185,10 @@ export const Order = () => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
+
+    // Sends the user to another page to show all the orders they had placed with that phone number
     // window.location.replace(`http://localhost:3000/consult/${phone}`)
   }
-
 
   return <div className="scrollable">
     <div className="question">

@@ -133,7 +133,7 @@ CREATE TABLE [dbo].[stateChangeUnit] (
 GO
 
 INSERT INTO [dbo].[neckType] ([name])
-VALUES ('Cuello redondo'),('Cuello V'),('Cuello polo');
+VALUES ('Redondo'),('V'),('Polo');
 
 INSERT INTO [dbo].[size] ([name])
 VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');

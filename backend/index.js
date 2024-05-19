@@ -20,9 +20,8 @@ const config = {
 
 const PORT = process.env.PORT || 3001;
 
-// Allows the access to the public
+// Allows the access to the directory public(the project files)
 app.use(express.static('public'));
-
 // To allow the request from the app 
 app.use(cors());
 // Limits the request size to 50mb
@@ -174,7 +173,7 @@ app.get("/unit/:id", async (req, res) => {
     request.input('inId', sql.Int, id);
     
     const result = await request.execute('read_units_by_order_id');
-    console.log(result.recordset)
+
     res.json(result.recordset);
   } 
   catch (error) {

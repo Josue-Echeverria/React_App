@@ -4,13 +4,13 @@
     flex-direction: row;
     margin: 3vw;
 }
-
-img{
+#order img{
     max-width: 100%;
     max-height: 100%;
     height: auto;
     width: 35vw
-  }
+    
+}
 #info{
     display:flex;
     flex-wrap: wrap;
@@ -22,7 +22,6 @@ img{
     align-items: center;
     justify-content: space-between;
     flex: 1;
-    margin: 3vw;
     height: 5vh;
     margin-top: 2vh;
     margin-bottom: 2vh;
@@ -31,6 +30,7 @@ img{
     text-align: right;
 }
 .data label{
+    margin-left: 2vw;
     text-align: left;
 }
 #orderListItem{
