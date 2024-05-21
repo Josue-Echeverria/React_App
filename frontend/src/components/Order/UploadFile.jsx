@@ -1,4 +1,5 @@
 import React, { useRef, useState  } from 'react'
+import { post } from '../../endpoints';
 
 const ALLOWEDTYPES = ['image/jpeg', 'image/jpg', 'image/png']
 
@@ -37,15 +38,25 @@ export const UploadFile = (props) => {
     // Define the onload event for the FileReader
     reader.onloadend = (e) => {
       // Shows the image
-      setImageSrc(e.target.result);
+      const img = e.target.result
+      const phone = props.phone
+      setImageSrc(img);
+      if(props.isSecondPayment){
+        let result = post(`/secondPayment/${props.id}`, {img, phone})
+        if(result.ok)
+          alert("Imagen guardada")
+      }
     };
-
     //  When the read operation is finished, the readyState becomes DONE, and the loadend is triggered
     reader.readAsDataURL(fileObj);
     document.querySelector(`#plusIcon${props.fileName}`).style.display = "none"
     // Reset the value of the file input element
     event.target.value = null; 
   };
+  if(props.idImgSecondPayment !== null && props.idImgSecondPayment !== undefined){
+    if(document.querySelector("#uploadFile") !== null)
+      document.querySelector("#uploadFile").style.display = "none"
+  }
 
 
   return <div id="uploadFile" className="imgDiv" onClick={handleClick} >

@@ -16,6 +16,10 @@ button:disabled{
     width: 80%;
 }
 
+#orderConsult .fa-pen{
+    display: flex;
+}  
+
 .fa-check{
     display: none;
 }

@@ -22,3 +22,12 @@ button{
     margin-bottom: 3vh;
     padding-top: 3vh;
 }
+
+.buttonsDivIcons{
+    display: flex;
+    flex-direction: row;
+}
+.buttonsDivIcons i{
+    width: 8vw;
+    margin-left: 2vw;
+}

@@ -26,7 +26,7 @@ export const Order = () => {
     // Creates units accordingly to the amount especified in the quantity input
     // And stores them in an array
     for (let number = 1; number <= e.target.value; number++) {
-      units.push(<Unit key={number} unitNumber = {number}/>)
+      units.push(<Unit key={number} unitNumber = {number} isConsult={false}/>)
     }
     // Displays the array of units in the div "units"
     unitsRoot.render(
@@ -58,12 +58,12 @@ export const Order = () => {
     // Confirm that the necktype and size have been especified
     // The store the unit
     for(let i = 1; i<= quantity; i++){
-      unitSize = document.querySelector(`#unit${i}Size`).textContent
+      unitSize = document.querySelector(`#sizeUnit${i}`).textContent
       if(unitSize === ""){
         alert(`Por favor especifique la talla de la unidad ${i}`)
         return null
       }
-      unitNeckType = document.querySelector(`#unit${i}NeckType`).textContent
+      unitNeckType = document.querySelector(`#neckTypeUnit${i}`).textContent
       if(unitNeckType === ""){
         alert(`Por favor especifique el tipo de cuello de la unidad ${i}`)
         return null
@@ -187,13 +187,13 @@ export const Order = () => {
     }
 
     // Sends the user to another page to show all the orders they had placed with that phone number
-    // window.location.replace(`http://localhost:3000/consult/${phone}`)
+    window.location.replace(`http://localhost:3000/consult/${phone}`)
   }
 
   return <div className="scrollable">
     <div className="question">
       <label>Diseño: </label><br/>
-      <UploadFile fileName="designImg"/>
+      <UploadFile fileName="designImg" isSecondPayment={false}/>
     </div>
 
     <div className="question">
@@ -231,14 +231,14 @@ export const Order = () => {
         <label>Primer pago:</label>
         <p id="firstHalf"></p> 
       </div> 
-      <UploadFile fileName="firstPaymentImg"/>
+      <UploadFile fileName="firstPaymentImg" isSecondPayment={false}/>
     </div>
     <div className="question" id="secondPaymentDiv">
       <div className="payment">
         <label>Segundo pago:</label>
         <p id="secondHalf"></p>  
       </div>
-      <UploadFile fileName="secondPaymentImg"/>
+      <UploadFile fileName="secondPaymentImg" isSecondPayment={false}/>
       <p className="info">No es necesario realizar el segundo pago en este instante </p>  
     </div> 
     <button id = "sendOrderBtn" onClick={sendOrder}>Enviar</button>

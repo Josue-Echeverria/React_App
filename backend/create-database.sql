@@ -225,7 +225,6 @@ SET NOCOUNT ON;
     WHERE a.idClient = @idClient;
 
     SET @outResultCode=0;
-
 SET NOCOUNT OFF;
 END;
 
@@ -236,7 +235,8 @@ CREATE PROCEDURE [dbo].[read_order_by_id]
 AS
 BEGIN
 SET NOCOUNT ON;
-    SELECT o.[date]
+    SELECT o.id
+    ,o.[date]
     , a.name
     , a.phone
     , a.direction
@@ -251,12 +251,10 @@ SET NOCOUNT ON;
     WHERE o.id = @inId;
 
     SET @outResultCode=0;
-
 SET NOCOUNT OFF;
 END;
 
 GO
-
 
 CREATE PROCEDURE [dbo].[read_units_by_order_id]
 	@outResultCode INT OUTPUT
@@ -272,7 +270,6 @@ SET NOCOUNT ON;
     WHERE u.idOrder = @inId
 
     SET @outResultCode=0;
-
 SET NOCOUNT OFF;
 END;
 GO
@@ -289,10 +286,136 @@ SET NOCOUNT ON;
     WHERE id = @inId
 
     SET @outResultCode=0;
-
 SET NOCOUNT OFF;
 END;
 GO
+
+GO
+CREATE PROCEDURE [dbo].[update_client]
+	@inNewname VARCHAR (64)
+    , @inNewDirection VARCHAR (128)
+    , @inOldPhone VARCHAR (16)
+    , @inNewPhone VARCHAR (16)
+	, @outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idClient INT;
+    
+    UPDATE dbo.client
+    SET name = @inNewname
+    , direction = @inNewDirection
+    , phone = @inNewPhone
+    WHERE @inOldPhone = phone;
+
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+CREATE PROCEDURE [dbo].[update_unit]
+	@inNewSize VARCHAR (5)
+    , @inNewNecktType VARCHAR (16)
+    , @inNewDescription VARCHAR (256)
+    , @inId INT
+	, @outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idClient INT;
+    DECLARE @idNeckType INT;
+    DECLARE @idSize INT;
+    
+    SELECT @idSize = id
+    FROM dbo.[size]
+    WHERE name = @inNewSize
+
+    SELECT @idNeckType = id
+    FROM dbo.[neckType]
+    WHERE name = @inNewNecktType
+
+    UPDATE dbo.unit
+    SET idSize = @idSize
+    , idNeckType = @idNeckType
+    , [description] = @inNewDescription
+    WHERE id = @inId;
+
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+GO
+
+GO
+CREATE PROCEDURE [dbo].[upload_second_payment]
+    @inImgSecondPayment VARCHAR (MAX)
+    , @inId INT
+    , @inPhone INT
+	, @outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idClient INT;
+    DECLARE @idImgSecondPayment INT;
+    
+    SELECT @idClient = id 
+    FROM dbo.client 
+    WHERE phone = @inPhone; 
+	
+    INSERT INTO dbo.image (image, idClient, date)
+    VALUES (@inImgSecondPayment, @idClient, CURRENT_TIMESTAMP);
+    SET @idImgSecondPayment = @@IDENTITY;
+
+    UPDATE dbo.[order]
+    SET idImgSecondPayment = @idImgSecondPayment
+    WHERE id = @inId;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+GO
+
+GO
+CREATE PROCEDURE [dbo].[delete_order]
+	@outResultCode INT OUTPUT
+    , @inId INT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idImgDesign INT;
+    DECLARE @idImgFirstPayment INT;
+    DECLARE @idImgSecondPayment INT;
+
+    SELECT @idImgDesign = idImgDesign
+    , @idImgFirstPayment = idImgFirstPayment
+    , @idImgSecondPayment = idImgSecondPayment
+    FROM dbo.[order]
+
+    DELETE U
+    FROM dbo.[unit] U
+    INNER JOIN dbo.[order] A ON A.id = U.idOrder
+
+    DELETE FROM dbo.[order]
+    WHERE @inId = id;
+
+    -- DELETE 
+    -- FROM dbo.[image] 
+    -- WHERE @idImgDesign = id 
+    -- OR @idImgFirstPayment = id
+    -- OR @idImgSecondPayment = id;
+
+    SELECT * 
+    FROM dbo.[image] 
+    WHERE @idImgDesign = id 
+    OR @idImgFirstPayment = id
+    OR @idImgSecondPayment = id;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+GO
+
 
 
 

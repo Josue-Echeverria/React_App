@@ -184,4 +184,87 @@ app.get("/unit/:id", async (req, res) => {
   }
   });
 
+app.post("/UpdateClient/:phone", async (req, res) => {
+  try{
+    const {name, phone, direction} = req.body
+    const oldPhone = req.params.phone
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    request.input('inNewName', sql.VarChar(64), name);
+    request.input('inNewPhone', sql.VarChar(16), phone);
+    request.input('inOldPhone', sql.VarChar(16), oldPhone);
+    request.input('inNewDirection', sql.VarChar(128), direction);
+    
+    const result = await request.execute('update_client');
+    if(result.output.outResultCode !== null)
+        res.status(200).send('Client updated');
+    else
+        res.status(500).send('Error while updating');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+  });
+
+app.post("/UpdateUnit/:id", async (req, res) => {
+  try{
+    const {size, neckType, description} = req.body
+    const id = req.params.id
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    request.input('inNewSize', sql.VarChar(5), size);
+    request.input('inNewNecktType', sql.VarChar(16), neckType);
+    request.input('inNewDescription', sql.VarChar(256), description);
+    request.input('inId', sql.Int, id);
+    
+    const result = await request.execute('update_unit');
+    if(result.output.outResultCode !== null)
+        res.status(200).send('Order updated');
+    else
+        res.status(500).send('Error updating');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
   
+
+app.post("/secondPayment/:id", async (req, res) => {
+  try{
+    const {img, phone} = req.body
+    const id = req.params.id
+    await sql.connect(config);
+    console.log(phone)
+    console.log(id)
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    request.input('inPhone', sql.VarChar(16), phone);
+    request.input('inId', sql.Int, id);
+    request.input('inImgSecondPayment', sql.VarChar(sql.MAX), img);
+    
+    const result = await request.execute('upload_second_payment');
+    if(result.output.outResultCode !== null)
+        res.status(200).send('img uploaded');
+    else
+        res.status(500).send('error while uploading');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+  
+

@@ -1,6 +1,14 @@
 import React from "react";
 import "./Unit.css"
-import { cancelEdit, saveEdit } from "../Consult/OrderDetails";
+import { post } from "../../endpoints";
+
+/**
+ * ORIGINAL is an object that stores the original values of the inputs.
+ * @type {Object}
+ */
+let ORIGINAL = {}
+
+
 
 function disableButtons(div){
     let buttons = div.getElementsByTagName('button')
@@ -9,15 +17,40 @@ function disableButtons(div){
     }
 }
 
-function unableButtons(div){
+function enableButtons(div){
     let buttons = div.getElementsByTagName('button')
     for (var i = 0; i < buttons.length; i++) {
         buttons[i].disabled = false;
     }
 }
 
-export const Unit = (props) => {
+function loadPredefinedData(props){
+    ORIGINAL[props.unitNumber] = {}
+
+    ORIGINAL[props.unitNumber]["size"] = props.size 
+    let sizeBtn = document.querySelector(`#size${props.size}Unit${props.unitNumber}Btn`)
+    sizeBtn.style.backgroundColor = "#B8F67B"
+    document.querySelector(`#sizeUnit${props.unitNumber}`).textContent = props.size
     
+    ORIGINAL[props.unitNumber]["neckType"] = props.neckType 
+    let neckType = document.querySelector(`#neckType${props.neckType}Unit${props.unitNumber}Btn`)
+    neckType.style.backgroundColor = "#B8F67B"
+    document.querySelector(`#neckTypeUnit${props.unitNumber}`).textContent = props.neckType 
+
+    ORIGINAL[props.unitNumber]["detail"] = props.detail 
+    let detail = document.querySelector(`#unit${props.unitNumber}Detail`)
+    detail.value = props.detail
+    
+    let sizeButtons = document.querySelector(`#unit${props.unitNumber}sizeButtons`)
+    let neckTypeButtons = document.querySelector(`#unit${props.unitNumber}neckTypeButtons`)
+
+    disableButtons(sizeButtons);
+    disableButtons(neckTypeButtons);
+    detail.disabled = true
+}
+    
+export const Unit = (props) => {
+
     /**
      * @param {Event} e  event click on the element
      * 
@@ -26,7 +59,7 @@ export const Unit = (props) => {
     function handleButtonSizeClick(e){
         const buttonsDiv = document.querySelector(`#unit${props.unitNumber}sizeButtons`).getElementsByTagName('button')
         const buttonsDivLength = buttonsDiv.length
-        const actualSize = document.querySelector(`#unit${props.unitNumber}Size`)
+        const actualSize = document.querySelector(`#sizeUnit${props.unitNumber}`)
         for(let i = 0; i<buttonsDivLength;i++)
             buttonsDiv[i].style.backgroundColor = "#B3B3B3"
         
@@ -34,6 +67,7 @@ export const Unit = (props) => {
         //Stores wich size was selected
         actualSize.textContent = e.target.textContent
     }
+
 
     /**
      * @param {Event} e  event click on the element
@@ -43,7 +77,7 @@ export const Unit = (props) => {
     function handleButtonNeckClick(e){
         const buttonsDiv = document.querySelector(`#unit${props.unitNumber}neckTypeButtons`).getElementsByTagName('button')
         const buttonsDivLength = buttonsDiv.length
-        const actualNeckType = document.querySelector(`#unit${props.unitNumber}NeckType`)
+        const actualNeckType = document.querySelector(`#neckTypeUnit${props.unitNumber}`)
         for(let i = 0; i<buttonsDivLength;i++)
             buttonsDiv[i].style.backgroundColor = "#B3B3B3"
         
@@ -52,37 +86,98 @@ export const Unit = (props) => {
         actualNeckType.textContent = e.target.textContent
     }
 
+
+    async function saveUpdate(e){
+        const parentNode = e.target.parentNode
+        const childNodes = parentNode.childNodes
+        const parentDivButtons = e.target.parentNode.parentNode
+        const buttonsDiv = parentDivButtons.childNodes[parentDivButtons.childNodes.length-1]
+        const description = document.querySelector(`#unit${props.unitNumber}Detail`).value
+        const size = document.querySelector(`#sizeUnit${props.unitNumber}`).textContent
+        const neckType = document.querySelector(`#neckTypeUnit${props.unitNumber}`).textContent
+        disableButtons(buttonsDiv)
+
+        await post(`/UpdateUnit/${props.unitNumber}`, {size, description, neckType})
+        alert("Cambios guardados")
+        childNodes[0].disabled = true
+        childNodes[1].style.display = "flex"
+        childNodes[2].style.display = "none"
+        childNodes[3].style.display = "none"
+    }
+
+
+    /**
+     * 
+     * @param {*} e 
+     */
+    function cancelUpdate(e){
+        const parentNode = e.target.parentNode
+        const childNodes = parentNode.childNodes
+        const parentDivButtons = e.target.parentNode.parentNode
+        const buttonsDiv = parentDivButtons.childNodes[parentDivButtons.childNodes.length-1]
+        const buttons = buttonsDiv.getElementsByTagName('button')
+        let div 
+        if(buttons.length >= 9){
+            div = "size"
+        }else{
+            div = "neckType"
+        }
+        for(let i = 0; i<buttons.length;i++){
+            buttons[i].style.backgroundColor = "#B3B3B3"
+            if(buttons[i].id === `${div}${ORIGINAL[props.unitNumber][div]}Unit${props.unitNumber}Btn`)
+                buttons[i].style.backgroundColor = "#B8F67B"
+        }
+        disableButtons(buttonsDiv)
+        childNodes[1].style.display = "flex"
+        childNodes[2].style.display = "none"
+        childNodes[3].style.display = "none"
+        const actualSize = document.querySelector(`#${div}Unit${props.unitNumber}`)
+        actualSize.textContent = ORIGINAL[props.unitNumber][div]
+    }
+
+
+    function cancelDescriptionUpdate(e){
+        const parentNode = e.target.parentNode
+        const childNodes = parentNode.childNodes
+        childNodes[0].value = ORIGINAL[props.unitNumber]["detail"]
+        childNodes[0].disabled = true
+        childNodes[1].style.display = "flex"
+        childNodes[2].style.display = "none"
+        childNodes[3].style.display = "none"
+    }
+
+
+    function update(e){
+        const parentNode = e.target.parentNode
+        const childNodes = parentNode.childNodes
+        // console.log(childNodes)
+        if(childNodes[0].id == `unit${props.unitNumber}Detail`){
+            childNodes[0].disabled = false
+        }else{
+            const parentDivButtons = e.target.parentNode.parentNode
+            const buttonsDiv = parentDivButtons.childNodes[parentDivButtons.childNodes.length-1]
+            enableButtons(buttonsDiv)
+        }
+        childNodes[1].style.display = "none"
+        childNodes[2].style.display = "flex"
+        childNodes[3].style.display = "flex"
+    }
+
+    console.log(props.size)
     let sizeBtn = document.querySelector(`#size${props.size}Unit${props.unitNumber}Btn`)
     if(props.size !== undefined && sizeBtn !== null){
-        sizeBtn.style.backgroundColor = "#B8F67B"
+        loadPredefinedData(props)
     }
-    let neckType = document.querySelector(`#${props.neckType}Unit${props.unitNumber}Btn`)
-    if(props.neckType !== undefined && neckType !== null){
-        neckType.style.backgroundColor = "#B8F67B"
-    }
-    let detail = document.querySelector(`#unit${props.unitNumber}Detail`)
-    if(props.detail !== undefined && detail !== null){
-        detail.value = props.detail
-    }
-
-    let sizeButtons = document.querySelector(`#unit${props.unitNumber}sizeButtons`)
-    let neckTypeButtons = document.querySelector(`#unit${props.unitNumber}neckTypeButtons`)
-    if(props.disabled === true 
-    && sizeButtons !== null
-    && neckTypeButtons !== null){
-        disableButtons(sizeButtons);
-        disableButtons(neckTypeButtons);
-        detail.disabled = true
-    }
-
 
     return <div id="unit"><br/>
     <label>Unidad {props.unitNumber}</label><br/><br/>
     <div className="buttonsDiv">
-        <label>Talla: </label>
-        <i class="fa-solid fa-pen" ></i>
-        <i class="fa-solid fa-check" onClick={saveEdit}></i>
-        <i class="fa-solid fa-xmark" onClick={cancelEdit}></i>
+        <div className="buttonsDivIcons">
+            <label>Talla: </label>
+            <i class="fa-solid fa-pen" onClick={update} ></i>
+            <i class="fa-solid fa-check" onClick={saveUpdate}></i>
+            <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
+        </div>
         <div className="unitButtons" id={`unit${props.unitNumber}sizeButtons`}>
             <button id={`sizeXLUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonSizeClick}>XL</button>
             <button id={`sizeLUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonSizeClick}>L</button>
@@ -97,26 +192,28 @@ export const Unit = (props) => {
 
     </div>
     <div className="buttonsDiv"><br/>
-        <label>Tipo de cuello: </label>
-        <i class="fa-solid fa-pen" ></i>
-        <i class="fa-solid fa-check" onClick={saveEdit}></i>
-        <i class="fa-solid fa-xmark" onClick={cancelEdit}></i>
+        <div className="buttonsDivIcons">
+            <label>Tipo de cuello: </label>
+            <i class="fa-solid fa-pen" onClick={update}></i>
+            <i class="fa-solid fa-check" onClick={saveUpdate}></i>
+            <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
+        </div>
         <div className="unitButtons" id={`unit${props.unitNumber}neckTypeButtons`}>
-            <button id={`RedondoUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonNeckClick}>Redondo</button>
-            <button id={`VUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonNeckClick}>V</button>
-            <button id={`PoloUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonNeckClick}>Polo</button>
+            <button id={`neckTypeRedondoUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonNeckClick}>Redondo</button>
+            <button id={`neckTypeVUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonNeckClick}>V</button>
+            <button id={`neckTypePoloUnit${props.unitNumber}Btn`} className="unitButton" onClick={handleButtonNeckClick}>Polo</button>
         </div>
     </div>
     <div id="detailDiv">
         <label>Detalle:</label>
         <div className="data">
             <input type="text" id={`unit${props.unitNumber}Detail`}/>
-            <i class="fa-solid fa-pen"></i>
-            <i class="fa-solid fa-check"></i>
-            <i class="fa-solid fa-xmark"></i>
+            <i class="fa-solid fa-pen" onClick={update}></i>
+            <i class="fa-solid fa-check" onClick={saveUpdate}></i>
+            <i class="fa-solid fa-xmark" onClick={cancelDescriptionUpdate}></i>
         </div>
     </div>
-    <p style={{display:"none"}} id={`unit${props.unitNumber}Size`}></p>
-    <p style={{display:"none"}} id={`unit${props.unitNumber}NeckType`}></p>
+    <p style={{display:"none"}} id={`sizeUnit${props.unitNumber}`}></p>
+    <p style={{display:"none"}} id={`neckTypeUnit${props.unitNumber}`}></p>
 </div>;
 };
