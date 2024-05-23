@@ -97,7 +97,7 @@ export const Unit = (props) => {
         const neckType = document.querySelector(`#neckTypeUnit${props.unitNumber}`).textContent
         disableButtons(buttonsDiv)
 
-        await post(`/UpdateUnit/${props.unitNumber}`, {size, description, neckType})
+        await post(`/update/unit/${props.unitNumber}`, {size, description, neckType})
         alert("Cambios guardados")
         childNodes[0].disabled = true
         childNodes[1].style.display = "flex"
@@ -162,8 +162,6 @@ export const Unit = (props) => {
         childNodes[2].style.display = "flex"
         childNodes[3].style.display = "flex"
     }
-
-    console.log(props.size)
     let sizeBtn = document.querySelector(`#size${props.size}Unit${props.unitNumber}Btn`)
     if(props.size !== undefined && sizeBtn !== null){
         loadPredefinedData(props)

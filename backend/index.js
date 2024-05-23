@@ -68,7 +68,7 @@ app.post("/order", async (req, res) => {
   } finally {
     sql.close();
   }
-  });
+});
 
 
 /** GET ORDERS
@@ -96,7 +96,7 @@ app.get("/orders/:phone", async (req, res) => {
   } finally {
     sql.close();
   }
-  });
+});
 
 
 /** GET ORDER
@@ -125,7 +125,7 @@ app.get("/order/:id", async (req, res) => {
   } finally {
     sql.close();
   }
-  });
+});
 
 
 /** GET IMAGE
@@ -153,7 +153,7 @@ app.get("/image/:id", async (req, res) => {
   } finally {
     sql.close();
   }
-  });
+});
 
 
 /** GET UNITS
@@ -182,9 +182,16 @@ app.get("/unit/:id", async (req, res) => {
   } finally {
     sql.close();
   }
-  });
+});
 
-app.post("/UpdateClient/:phone", async (req, res) => {
+
+/** UPDATE CLIENT
+ * 
+ * @description Updates the client information (phone, name, direction)
+ * 
+ * @satisfies Update order 
+ */
+app.post("/update/client/:phone", async (req, res) => {
   try{
     const {name, phone, direction} = req.body
     const oldPhone = req.params.phone
@@ -209,9 +216,16 @@ app.post("/UpdateClient/:phone", async (req, res) => {
   } finally {
     sql.close();
   }
-  });
+});
 
-app.post("/UpdateUnit/:id", async (req, res) => {
+
+/** UPDATE UNIT
+ * 
+ * @description Updates the unit information (Size, neckType, description)
+ * 
+ * @satisfies Update order 
+ */
+app.post("/update/unit/:id", async (req, res) => {
   try{
     const {size, neckType, description} = req.body
     const id = req.params.id
@@ -239,13 +253,18 @@ app.post("/UpdateUnit/:id", async (req, res) => {
 });
   
 
+/** UPLOAD SECOND PAYMENT IMAGE
+ * 
+ * @description Uploads the image of the second payment
+ * 
+ * @satisfies Payment management
+ * 
+ */
 app.post("/secondPayment/:id", async (req, res) => {
   try{
     const {img, phone} = req.body
     const id = req.params.id
     await sql.connect(config);
-    console.log(phone)
-    console.log(id)
     const request = new sql.Request();
     request.output('outResultCode', sql.Int);
     request.input('inPhone', sql.VarChar(16), phone);
@@ -266,5 +285,50 @@ app.post("/secondPayment/:id", async (req, res) => {
     sql.close();
   }
 });
-  
+
+
+/** DELETE ORDER
+ * 
+ * @description Deletes the order and all the images that correspond to that image
+ * 
+ * @satisfies Delete order
+ */
+app.delete("/order/:id/:reason", async (req, res) => {
+  try{
+    const id = req.params.id
+    const reason = req.params.reason
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    request.input('inId', sql.Int, id);
+    const result = await request.execute('delete_order');
+
+    // DELETE IMAGE OF THE DESIGN
+    const requestDeleteDesign = new sql.Request(); 
+    requestDeleteDesign.output('outResultCode', sql.Int);
+    requestDeleteDesign.input('inId', sql.Int, result.recordset[0]["idImgDesign"]);
+    await requestDeleteDesign.execute('delete_image');
+
+    // DELETE THE IMAGE OF THE FIRST PAYMENT
+    const requestDeleteFirstPayment = new sql.Request(); 
+    requestDeleteFirstPayment.output('outResultCode', sql.Int);
+    requestDeleteFirstPayment.input('inId', sql.Int, result.recordset[0]["idImgFirstPayment"]);
+    await requestDeleteFirstPayment.execute('delete_image');
+
+    // DELETE THE IMAGE OF THE SECOND PAYMENT
+    if(result.recordset[0]["idImgSecondPayment"] !== null){
+      const requestDeleteSecondPayment = new sql.Request(); 
+      requestDeleteSecondPayment.output('outResultCode', sql.Int);
+      requestDeleteSecondPayment.input('inId', sql.Int, result.recordset[0]["idImgSecondPayment"]);
+      await requestDeleteSecondPayment.execute('delete_image');
+    }
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
 

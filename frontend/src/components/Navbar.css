@@ -15,13 +15,6 @@ nav {
     top: 0;
 }
 
-nav .title {
-    font-size: 3vw;
-    margin: 1rem;
-    font-weight: bold;
-    text-decoration: none;
-    color: white;
-}
 
 nav ul {
     display: flex;
@@ -71,13 +64,41 @@ nav ul li a:not(.active):hover {
     display: none;
     flex-direction: column;
     position: absolute;
-    background-color: #f1f1f1;
+    background-color: #adadad;
+    width: 100%;
 }
-  
+
   
 .dropdown-content a {
     color: black;
-    width: 100%;
-    height: 100%;
     padding: 6vw 8vw;
+    border-bottom: solid black;
 }
+
+#labelLink{
+    text-decoration: underline;
+}
+
+.popup-content p{
+    width: 70%;
+     font-size: 5vw;
+}
+#consultNumber{
+    font-size: 5vw;
+
+}
+
+.modal{
+    display: flex;
+    flex-direction: column;
+    font-size: 5vw;
+}
+
+
+.simpleModal{
+    align-items: center;
+}
+.modalItem{
+    margin: 2vh;
+}
+

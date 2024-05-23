@@ -24,3 +24,18 @@ export async function post(dir, body){
     return response
   }
 }
+
+export async function del(dir){
+  const request = new Request(`http://localhost:3001${dir}`, {
+    method: "DELETE",
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }else{
+    return response
+  }
+}

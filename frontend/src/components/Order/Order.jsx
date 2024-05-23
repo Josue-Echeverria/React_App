@@ -190,6 +190,14 @@ export const Order = () => {
     window.location.replace(`http://localhost:3000/consult/${phone}`)
   }
 
+  const dropbtn = document.querySelector(".dropbtn");
+  if(dropbtn !== null){
+    dropbtn.style.display = "none"
+    const backbtn = document.querySelector(".backbtn");
+    backbtn.href = "/"
+    backbtn.style.display = "flex"
+  }
+
   return <div className="scrollable">
     <div className="question">
       <label>Diseño: </label><br/>

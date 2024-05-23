@@ -416,6 +416,21 @@ SET NOCOUNT OFF;
 END;
 GO
 
+GO
+CREATE PROCEDURE [dbo].[delete_image]
+	@outResultCode INT OUTPUT
+    , @inId INT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    DELETE FROM dbo.[image]
+    WHERE @inId = id;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+GO
 
 
 

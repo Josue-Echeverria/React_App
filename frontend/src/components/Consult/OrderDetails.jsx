@@ -61,7 +61,7 @@ async function saveUpdate(e){
   let name = document.querySelector("#nameInput").value
   let direction = document.querySelector("#directionInput").value
 
-  await post(`/UpdateClient/${phone}`, {phone, name, direction})
+  await post(`/update/client/${phone}`, {phone, name, direction})
   alert("Cambios guardados")
 
   childNodes[0].disabled = true
@@ -97,27 +97,26 @@ export const OrderDetails = () => {
           // hide the input 
           if(document.querySelector("#uploadFile") !== null)
             document.querySelector("#uploadFile").style.display = "none"
-        }else{
-          // hide the image 
-          order["ImgSecondPayment"] = ""
-          if(document.querySelector("#imgSecondPayment") !== null)
-            document.querySelector("#imgSecondPayment").style.display = "none"
         }
+        
         // Get all the units that referenced the order code
         order["units"] = await get(`/unit/${code}`)
+        order["ImgSecondPayment"] = ""
         setData(order); // Set the data to show everything in the frontend
+        // hide the image 
+        if(document.querySelector("#imgSecondPaymentDiv") !== null)
+          document.querySelector("#imgSecondPaymentDiv").style.display = "none"
+
+        const dropbtn = document.querySelector(".dropbtn");
+        dropbtn.style.display = "none"
+        const backbtn = document.querySelector(".backbtn");
+        backbtn.href = `/consult/${order["phone"]}`
+        backbtn.style.display = "flex"
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData(); // Call the async function
-    // var icons = document.querySelectorAll('.fa-solid.fa-pen');
-    // for (var i = 0; i < icons.length; i++) {
-    //     icons[i].style.display = 'flex';
-    // }
-        
-    
-    
   }, [code]); 
 
   
@@ -193,7 +192,7 @@ export const OrderDetails = () => {
       <label>Comprobante de segundo pago:</label><br/>
       <div className="">
         <UploadFile isSecondPayment={true} id={data.id} phone={data.phone} idImgSecondPayment = {data.idImgSecondPayment}/>
-        <div className="imgDiv">
+        <div className="imgDiv" id="imgSecondPaymentDiv">
           <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
         </div>
       </div>
