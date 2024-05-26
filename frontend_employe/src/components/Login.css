@@ -1,0 +1,50 @@
+#login{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color:rgb(179, 179, 179);
+}
+
+
+.container {
+    width: 80%;
+    padding: 15px;
+    margin: auto;
+    background-color: #172554;
+    border-radius: 3%;
+}
+
+.container label{
+    color: white;
+}
+
+input[type=text], input[type=password] {
+    width: 85%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+}
+
+input{
+    font-size: 4vw;
+    padding: 2vw;
+    height: 3vh;
+    position: relative;
+    left: 0;
+    border: 0px;
+    border-radius: 10px;
+    background-color: rgb(179, 179, 179);
+    box-shadow: 5px 5px 5px gray;
+  }
+
+  button{
+    border: 0px;
+    margin: 2vw;
+    padding: 4vw;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 2px 5px 5px gray;
+    font-size: 5vw;
+}

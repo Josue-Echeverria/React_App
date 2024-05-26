@@ -1,0 +1,14 @@
+.App {
+  background-color: #fefefe;
+  height: 100%;
+  width: 100%;
+}
+.inter101 {
+  font-family: "Inter", sans-serif;
+  font-size: 5vw;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0;
+}

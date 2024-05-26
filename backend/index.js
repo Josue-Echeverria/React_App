@@ -272,10 +272,6 @@ app.post("/secondPayment/:id", async (req, res) => {
     request.input('inImgSecondPayment', sql.VarChar(sql.MAX), img);
     
     const result = await request.execute('upload_second_payment');
-    if(result.output.outResultCode !== null)
-        res.status(200).send('img uploaded');
-    else
-        res.status(500).send('error while uploading');
     res.json(result.recordset);
   } 
   catch (error) {
@@ -332,3 +328,49 @@ app.delete("/order/:id/:reason", async (req, res) => {
   }
 });
 
+/** LOGIN
+ * 
+ * 
+ */
+app.post("/login", async (req, res) => {
+  try{
+    const {name, password} = req.body
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    request.input('inName', sql.VarChar(16), name);
+    request.input('inPassword', sql.VarChar(16), password);
+    
+    const result = await request.execute('login');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+/** GET ORDERS
+ * 
+ * @description Gets all the orders from the db registered to the number 
+ * 
+ * @satisfies READ ORDER
+ */
+app.get("/orders", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('read_orders_pending');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});

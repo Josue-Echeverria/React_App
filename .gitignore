@@ -2,6 +2,7 @@
 
 # dependencies
 /frontend/node_modules
+/frontend_employe/node_modules
 /backend/node_modules
 /.pnp
 .pnp.js
@@ -12,7 +13,8 @@
 
 # production
 /frontend/build
-
+/frontend_employe/build
+/frontend_employe/.env
 # misc
 .DS_Store
 .env.local

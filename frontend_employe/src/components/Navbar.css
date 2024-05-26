@@ -1,0 +1,24 @@
+/* styles.css */
+
+.active {
+    background-color: #1d4ed8;
+}
+
+nav {
+    display: flex;
+    height: 11vh;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0f172a;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+nav i {
+    padding: 7vw;
+    padding-right: 10vw;
+    padding-left: 10vw;
+    border-bottom: solid white 2vw;
+}
+

@@ -8,7 +8,6 @@ CREATE TABLE [dbo].[user] (
     [id]          INT IDENTITY(1,1) NOT NULL,
     [name]        VARCHAR (64) NOT NULL,
     [password]    VARCHAR (25) NOT NULL,
-    [is_employee] BIT          NOT NULL,
     CONSTRAINT [PK_user] PRIMARY KEY CLUSTERED ([id] ASC)
 );
 
@@ -139,7 +138,7 @@ INSERT INTO [dbo].[size] ([name])
 VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
 
 INSERT INTO [dbo].[state] ([name])
-VALUES ('En fabricación');
+VALUES ('En fabricación'),('Entregado');
 
 GO
 CREATE PROCEDURE [dbo].[create_order]
@@ -433,5 +432,46 @@ END;
 GO
 
 
+GO
+CREATE PROCEDURE [dbo].[login]
+    @inPassword VARCHAR (16)
+    , @inName VARCHAR (16)
+	, @outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    SELECT id
+    FROM dbo.[user]
+    WHERE [name] = @inName AND [password] = @inPassword;
+    
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+GO
+
+
+GO
+CREATE PROCEDURE [dbo].[read_orders_pending]
+	@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idDelivered INT;
+    
+    SELECT @idDelivered = id 
+    FROM dbo.[state] 
+    WHERE name = 'Entregado'
+
+    SELECT a.id, i.[image], c.phone
+    FROM dbo.[order] a
+    INNER JOIN dbo.[image] i ON a.idImgDesign = i.id
+    INNER JOIN dbo.[client] c ON a.idClient = c.id
+    WHERE a.idState != @idDelivered;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+GO
 
 
