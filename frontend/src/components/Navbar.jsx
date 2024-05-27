@@ -40,7 +40,6 @@ function Navbar(){
         <i class="fas fa-bars dropbtn" ></i>
         <i class="fas fa-arrow-left backbtn" href="/" style={{display:"none"}} ></i>
         <div class="dropdown-content">
-          
           <NavLink to="/order">Realizar pedido</NavLink>
           <Popup trigger={<a id="labelLink">Consultar pedido</a>} modal nested>
           {close => (

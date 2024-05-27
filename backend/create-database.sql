@@ -138,7 +138,7 @@ INSERT INTO [dbo].[size] ([name])
 VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
 
 INSERT INTO [dbo].[state] ([name])
-VALUES ('En fabricación'),('Entregado');
+VALUES ('En fabricación'),('Entregado'),('Listo');
 
 GO
 CREATE PROCEDURE [dbo].[create_order]
@@ -236,6 +236,7 @@ BEGIN
 SET NOCOUNT ON;
     SELECT o.id
     ,o.[date]
+    , b.name AS state
     , a.name
     , a.phone
     , a.direction
@@ -246,8 +247,9 @@ SET NOCOUNT ON;
     , o.idImgSecondPayment
     FROM dbo.[order] o
     INNER JOIN dbo.client a ON a.id = o.idClient
-    INNER JOIN dbo.client b ON b.id = o.idState
+    INNER JOIN dbo.[state] b ON b.id = o.idState
     WHERE o.id = @inId;
+
 
     SET @outResultCode=0;
 SET NOCOUNT OFF;

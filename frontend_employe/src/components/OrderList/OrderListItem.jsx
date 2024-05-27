@@ -6,11 +6,11 @@ import 'reactjs-popup/dist/index.css';
 
 export const OrderListItem = (props) => {
     function getOrder(){
-        window.location.replace(`http://localhost:3002/consult/${props.phone}/${props.code}`)
+        window.location.replace(`http://localhost:3002/order/${props.phone}/${props.code}`)
     }
 
     function deleteOrder(){
-        window.location.replace(`http://localhost:3002/consult/${props.phone}/${props.code}`)
+        // window.location.replace(`http://localhost:3002/order/${props.phone}/${props.code}`)
     }
     
     function sendCancelation(){
@@ -32,8 +32,9 @@ export const OrderListItem = (props) => {
         <div id="orderImgList">
             <p className="info" id="date">{props.date}</p> 
             <img src={props.image} alt="Design"></img>
-            <p>{props.phone}</p>
-            <p>{props.code}</p>
+            <label></label>
+            <p>Telefono: {props.phone}</p>
+            <p>Codigo {props.code}</p>
         </div>
             
         <div id="buttons">

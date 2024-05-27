@@ -17,7 +17,7 @@ let ORIGINAL = {}
  * It enables the input fields and shows the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-function update(e){
+export function update(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   ORIGINAL["phoneInput"] = document.querySelector("#phoneInput").value
@@ -36,7 +36,7 @@ function update(e){
  * It restores the original values and hides the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-function cancelUpdate(e){
+export function cancelUpdate(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   childNodes[0].value = ORIGINAL[parentNode.id]
@@ -54,7 +54,7 @@ function cancelUpdate(e){
  * It sends a POST request to update the client information and then disables the input fields and hides the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-async function saveUpdate(e){
+export async function saveUpdate(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   let phone = document.querySelector("#phoneInput").value

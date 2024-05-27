@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Unit } from "../Order/Unit";
-import { UploadFile } from "../Order/UploadFile";
+import { Unit } from "./Unit";
 import "./OrderDetail.css"
-import { post, get } from "../../endpoints";
+import { post, get, put } from "../../endpoints";
 
 /**
  * ORIGINAL is an object that stores the original values of the inputs.
  * @type {Object}
  */
 let ORIGINAL = {}
+const states = [('Entregado'),('En fabricación'),('Listo')]
 
 
 /**
@@ -17,17 +17,20 @@ let ORIGINAL = {}
  * It enables the input fields and shows the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-function update(e){
+export function update(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
-  ORIGINAL["phoneInput"] = document.querySelector("#phoneInput").value
-  ORIGINAL["nameInput"] = document.querySelector("#nameInput").value
-  ORIGINAL["directionInput"] = document.querySelector("#directionInput").value
-
-  childNodes[0].disabled = false
-  childNodes[1].style.display = "none"
-  childNodes[2].style.display = "flex"
+  const statesSelect = document.querySelector("#statesSelect")
+  let options = statesSelect.childNodes
+  // Sets the state as selected in the frontend
+  for(let i = 0; i<options.length; i++){
+    if(options[i].selected === true)
+      ORIGINAL["state"] = options[i].textContent
+  }
+  childNodes[1].disabled = false
+  childNodes[2].style.display = "none"
   childNodes[3].style.display = "flex"
+  childNodes[4].style.display = "flex"
 }
 
 
@@ -36,46 +39,79 @@ function update(e){
  * It restores the original values and hides the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-function cancelUpdate(e){
+export function cancelUpdate(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
-  childNodes[0].value = ORIGINAL[parentNode.id]
-  ORIGINAL = {}
+  const statesSelect = document.querySelector("#statesSelect")
+  let options = statesSelect.childNodes
+  // Sets the state as selected in the frontend
+  for(let i = 0; i<options.length; i++){
+    if(options[i].textContent === ORIGINAL["state"])
+      options[i].selected = true
+  }
 
-  childNodes[0].disabled = true
-  childNodes[1].style.display = "flex"
-  childNodes[2].style.display = "none"
+  childNodes[1].disabled = true
+  childNodes[2].style.display = "flex"
   childNodes[3].style.display = "none"
+  childNodes[4].style.display = "none"
 }
 
 
-/**
- * The saveUpdate function is triggered when the user saves the update.
- * It sends a POST request to update the client information and then disables the input fields and hides the save and cancel buttons.
- * @param {Event} e - The event object.
- */
-async function saveUpdate(e){
-  const parentNode = e.target.parentNode
-  const childNodes = parentNode.childNodes
-  let phone = document.querySelector("#phoneInput").value
-  let name = document.querySelector("#nameInput").value
-  let direction = document.querySelector("#directionInput").value
+function askSecondPayment(){
+  const statesSelect = document.querySelector("#statesSelect")
+  if(statesSelect.disabled){
+    alert("Primero debe cambiar el estado del pedido y guardar los cambios")
+    return
+  }
+  let options = statesSelect.childNodes
+  // Sets the state as selected in the frontend
+  for(let i = 0; i<options.length; i++){
+    if(options[i].textContent === "Listo")
+      if(options[i].selected)
+        post()
+      else
+        alert("Verifique que el pedido este listo antes de solicitar el segundo pago") 
 
-  await post(`/update/client/${phone}`, {phone, name, direction})
-  alert("Cambios guardados")
+  }
 
-  childNodes[0].disabled = true
-  childNodes[1].style.display = "flex"
-  childNodes[2].style.display = "none"
-  childNodes[3].style.display = "none"
 }
+
 
 export const OrderDetails = () => {
   const { code } = useParams();
-  const [data, setData] = useState(null); // Initialize data state
+  const [data, setData] = useState(null); 
+  const [imgSecondPayment, setimgSecondPayment] = useState(null); 
   const handleChange = (event) => {
     setData({...data, name: event.target.value}); // update state when input changes
   };
+
+
+  /**
+   * The saveUpdate function is triggered when the user saves the update.
+   * It sends a POST request to update the client information and then disables the input fields and hides the save and cancel buttons.
+   * @param {Event} e - The event object.
+   */
+  async function saveUpdate(e){
+    const parentNode = e.target.parentNode
+    const childNodes = parentNode.childNodes
+    let state;
+    // Gets the current state of the order
+    const statesSelect = document.querySelector("#statesSelect")
+    if(statesSelect !== null){
+      let options = statesSelect.childNodes
+      // Sets the state as selected in the frontend
+      for(let i = 0; i<options.length; i++){
+        if(options[i].selected)
+          state = options[i].textContent
+      }
+    }
+    put(`/update/state/${code}`, {state})
+
+    childNodes[1].disabled = true
+    childNodes[2].style.display = "flex"
+    childNodes[3].style.display = "none"
+    childNodes[4].style.display = "none"
+  }
 
   useEffect(() => {
     /**
@@ -93,25 +129,31 @@ export const OrderDetails = () => {
         // If the image of the second payment has been uploaded
         if(order["idImgSecondPayment"] !== null){
           // Show the image
+          setimgSecondPayment(true)
           order["imgSecondPayment"] = (await get(`/image/${order["idImgSecondPayment"]}`))[0]["image"]
-          // hide the input 
-          if(document.querySelector("#uploadFile") !== null)
-            document.querySelector("#uploadFile").style.display = "none"
         }
         
         // Get all the units that referenced the order code
         order["units"] = await get(`/unit/${code}`)
         order["ImgSecondPayment"] = ""
+
+        // Gets the current state of the order
+        const statesSelect = document.querySelector("#statesSelect")
+        if(statesSelect !== null){
+          let options = statesSelect.childNodes
+          // Sets the state as selected in the frontend
+          for(let i = 0; i<options.length; i++){
+            if(options[i].textContent === order["state"])
+              options[i].selected = true
+          }
+        }
         setData(order); // Set the data to show everything in the frontend
         // hide the image 
-        if(document.querySelector("#imgSecondPaymentDiv") !== null)
+        if(document.querySelector("#imgSecondPaymentDiv") !== null){
           document.querySelector("#imgSecondPaymentDiv").style.display = "none"
+          setimgSecondPayment(false)
 
-        const dropbtn = document.querySelector(".dropbtn");
-        dropbtn.style.display = "none"
-        const backbtn = document.querySelector(".backbtn");
-        backbtn.href = `/consult/${order["phone"]}`
-        backbtn.style.display = "flex"
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -120,12 +162,30 @@ export const OrderDetails = () => {
   }, [code]); 
 
   
-  return <div className="scrollable" id="orderConsult">
+  return <div id="orderConsult"> 
+  <nav>
+    <a href="/main">
+      <i class="fas fa-arrow-left backbtn"  >
+      </i>
+    </a>
+  </nav>
   {data && (
-  <div>
+ 
+  <div className="scrollable">
+    <div className="question states">
+      <label for="states">Estado:</label>
+      <select name="states" id="statesSelect" disabled>
+      {states.map((state)=>(
+        <option value={state}>{state}</option>
+      ))}
+      </select>
+      <i class="fa-solid fa-pen" onClick={update}></i>
+      <i class="fa-solid fa-check" onClick={saveUpdate}></i>
+      <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
+    </div>
     <div className="question" id="date">
-      <div className="data" id="date">
-        <label>Fecha de creacion: </label>
+      <div className="data">
+        <label>Fecha de creación: </label>
         <p className="info">{data.date.substring(0, 10)}</p>
       </div>
       <div className="imgDiv">
@@ -134,30 +194,15 @@ export const OrderDetails = () => {
     </div>
     <div className="question">
       <label>Nombre:</label>
-      <div className="data" id="name">
-        <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
-        <i class="fa-solid fa-check" onClick={saveUpdate}></i>
-        <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
-      </div>
+      <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/> 
     </div>
     <div className="question">
       <label>Número:</label>
-      <div className="data" id="phone">
-        <input value={data.phone} onChange={handleChange} disabled={true} id="phoneInput"/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
-        <i class="fa-solid fa-check" onClick={saveUpdate}></i>
-        <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
-      </div>
+      <input value={data.phone} onChange={handleChange} disabled={true} id="phoneInput"/> 
     </div>
     <div className="question">
       <label>Dirección:</label>
-      <div className="data" id="direction">
-        <input value={data.direction} onChange={handleChange} disabled={true} id="directionInput"/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
-        <i class="fa-solid fa-check" onClick={saveUpdate}></i>
-        <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
-      </div>
+      <input value={data.direction} onChange={handleChange} disabled={true} id="directionInput"/> 
     </div>
     <div className="question" id="quantity">
       <label>Cantidad:</label>
@@ -170,11 +215,11 @@ export const OrderDetails = () => {
                                             detail={unit.description}
                                             disabled={true}/>))}
 
-    <div className="question data" id="total">
+    <div className="question payment" id="total">
       <label>Total a pagar:</label>
       <p> {data.total} </p> 
     </div>
-    <div className="question data" >
+    <div className="question payment" >
       <label>Primer pago:</label>
       <p> {data.total/2} </p> 
     </div>
@@ -184,18 +229,18 @@ export const OrderDetails = () => {
         <img src={data.imgFirstPayment} alt="First Payment"></img>
       </div>
     </div>
-    <div className="question data">
+    <div className="question payment">
       <label>Segundo pago:</label>
       <p> {data.total/2} </p> 
     </div>
-    <div className="question">
-      <label>Comprobante de segundo pago:</label><br/>
-      <div className="">
-        <UploadFile isSecondPayment={true} id={data.id} phone={data.phone} idImgSecondPayment = {data.idImgSecondPayment}/>
+    <div className="question" id="SecondPaymentDiv">
+      {imgSecondPayment ? (<><label>Comprobante de segundo pago:</label><br/>
+      <div>
         <div className="imgDiv" id="imgSecondPaymentDiv">
           <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
         </div>
-      </div>
+      </div></>) : (<><button onClick={askSecondPayment} id="askSecondPayment">Solicitar segundo pago</button></>)}
+      
     </div>
   </div>)}
 </div>

@@ -5,7 +5,6 @@
     background-color:rgb(179, 179, 179);
 }
 
-
 .container {
     width: 80%;
     padding: 15px;
@@ -18,7 +17,7 @@
     color: white;
 }
 
-input[type=text], input[type=password] {
+.container input[type=text], input[type=password] {
     width: 85%;
     padding: 15px;
     margin: 5px 0 22px 0;
@@ -28,18 +27,18 @@ input[type=text], input[type=password] {
 }
 
 input{
+    z-index: 0;
     font-size: 4vw;
     padding: 2vw;
     height: 3vh;
-    position: relative;
     left: 0;
     border: 0px;
     border-radius: 10px;
     background-color: rgb(179, 179, 179);
     box-shadow: 5px 5px 5px gray;
-  }
+}
 
-  button{
+button{
     border: 0px;
     margin: 2vw;
     padding: 4vw;

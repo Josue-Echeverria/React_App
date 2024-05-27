@@ -18,31 +18,13 @@ img{
     flex-wrap: wrap;
 }
 
-.data{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    flex: 1;
-    height: 5vh;
-    padding-top: 3vh;
-    padding-bottom: 3vh;
-    margin-bottom: 0;
-}
 
-.itemData{
-    border-bottom: solid rgba(0, 0, 0, 0.183) 2px;
-    padding-left: 1vh;
-    padding-right: 1vh;
+#orderListItem label{
+    color: white;
+    background-color: #0f172a;
+    padding-top: 2vh;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.412);
 
-}
-
-.data p{
-    text-align: right;
-}
-
-.data label{
-    text-align: left;
 }
 
 #orderListItem{
@@ -50,31 +32,31 @@ img{
     flex-direction: column;
     height: fit-content;
     text-align: center;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.412);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.412);
     padding-bottom: 2vh;
 }
 
-#options{
-    display: flex;
-    flex-direction: column;
-}
-
 #orderImgList{
+    border: solid black 1px;
     width: 100vw;
 }
 
-#buttons button{
-    flex: 1;
-    height: 2vh;
-    /* margin-top: 8vh; */
+#orderImgList * {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
 }
 
 #buttons{
     display: flex;
+    padding-top: 10vh;
     flex-direction: column;
     justify-content: space-between;
-    height: 45vh;
+    height: 30vh;
     width: 70vw;
+}
+
+#buttons button{
+    height: 10vh;
 }
 
 #getBtn{

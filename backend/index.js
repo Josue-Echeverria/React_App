@@ -328,6 +328,7 @@ app.delete("/order/:id/:reason", async (req, res) => {
   }
 });
 
+
 /** LOGIN
  * 
  * 
@@ -365,6 +366,45 @@ app.get("/orders", async (req, res) => {
     const request = new sql.Request();
     request.output('outResultCode', sql.Int);
     const result = await request.execute('read_orders_pending');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.put("/update/state/:id", async (req,res) => {
+  try{
+    await sql.connect(config);
+    const id = req.params.id
+    const {state} = req.body
+    const request = new sql.Request();
+    request.input('inIdOrder', sql.Int, id);
+    request.input('inState', sql.VarChar(32), state);
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('change_state');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+
+});
+
+
+app.get("/clients", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('read_clients');
     res.json(result.recordset);
   } 
   catch (error) {
