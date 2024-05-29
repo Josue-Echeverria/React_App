@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Unit } from "./Unit";
 import "./OrderDetail.css"
 import { post, get, put } from "../../endpoints";
+import Popup from "reactjs-popup";
 
 /**
  * ORIGINAL is an object that stores the original values of the inputs.
@@ -131,12 +132,12 @@ export const OrderDetails = () => {
           // Show the image
           setimgSecondPayment(true)
           order["imgSecondPayment"] = (await get(`/image/${order["idImgSecondPayment"]}`))[0]["image"]
+        }else{
+          setimgSecondPayment(false)
         }
         
         // Get all the units that referenced the order code
         order["units"] = await get(`/unit/${code}`)
-        order["ImgSecondPayment"] = ""
-
         // Gets the current state of the order
         const statesSelect = document.querySelector("#statesSelect")
         if(statesSelect !== null){
@@ -148,12 +149,7 @@ export const OrderDetails = () => {
           }
         }
         setData(order); // Set the data to show everything in the frontend
-        // hide the image 
-        if(document.querySelector("#imgSecondPaymentDiv") !== null){
-          document.querySelector("#imgSecondPaymentDiv").style.display = "none"
-          setimgSecondPayment(false)
 
-        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -193,8 +189,22 @@ export const OrderDetails = () => {
       </div>
     </div>
     <div className="question">
-      <label>Nombre:</label>
-      <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/> 
+      <div className="">
+        <label>Nombre:</label> 
+        <Popup trigger={<i class="fa-solid fa-circle-exclamation"></i>} nested>
+        {close => (
+        <div className="modalExclamation">
+            <button className="close" onClick={close}>&times;</button>
+            <div className="content">
+                <p>Desea indicar al usuario que el espacio no esta claro</p>
+            </div>
+            <button onClick= {askSecondPayment}>Confirmar</button>
+        </div>
+        )}
+        </Popup>
+      </div>
+
+      <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/>
     </div>
     <div className="question">
       <label>Número:</label>
@@ -239,7 +249,19 @@ export const OrderDetails = () => {
         <div className="imgDiv" id="imgSecondPaymentDiv">
           <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
         </div>
-      </div></>) : (<><button onClick={askSecondPayment} id="askSecondPayment">Solicitar segundo pago</button></>)}
+      </div></>) : (<>
+      <Popup trigger={<button id="askSecondPayment">Solicitar segundo pago</button>} modal nested>
+      {close => (
+      <div className="modal">
+          <button className="close" onClick={close}>&times;</button>
+          <div className="content">
+              <p>Indique cuanto debe de pagar el cliente en el segundo pago: </p>
+              <input id="secondPaymentAmount"></input>
+          </div>
+          <button className="send" onClick= {askSecondPayment}>Enviar</button>
+      </div>
+      )}
+      </Popup></>)}
       
     </div>
   </div>)}

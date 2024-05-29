@@ -32,7 +32,6 @@ export const OrderListItem = (props) => {
         <div id="orderImgList">
             <p className="info" id="date">{props.date}</p> 
             <img src={props.image} alt="Design"></img>
-            <label></label>
             <p>Telefono: {props.phone}</p>
             <p>Codigo {props.code}</p>
         </div>
@@ -40,7 +39,6 @@ export const OrderListItem = (props) => {
         <div id="buttons">
             <button onClick={getOrder} id="getBtn"><i class="fa-solid fa-eye"></i></button>
             <Popup trigger={<button onClick={deleteOrder} id="delBtn"><i class="fa-solid fa-trash-can"></i></button>} modal nested>
-
             {close => (
             <div className="modal">
                 <button className="close" onClick={close}>&times;</button>

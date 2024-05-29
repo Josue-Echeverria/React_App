@@ -10,7 +10,6 @@ img{
     max-height: 100%;
     height: auto;
     width: 35vw
-    
 }
 
 #info{
@@ -18,13 +17,12 @@ img{
     flex-wrap: wrap;
 }
 
-
 #orderListItem label{
     color: white;
+    font-weight: bold;
     background-color: #0f172a;
     padding-top: 2vh;
     border-bottom: 2px solid rgba(0, 0, 0, 0.412);
-
 }
 
 #orderListItem{
@@ -32,7 +30,7 @@ img{
     flex-direction: column;
     height: fit-content;
     text-align: center;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.412);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.412);
     padding-bottom: 2vh;
 }
 
@@ -81,8 +79,7 @@ img{
 
 .modal > .content {
     width: 100%;
-    padding-left: 5vw;
-    padding-right: 5vw;
+    padding-left: 3vw;
 }
 
 .modal > .close {
@@ -127,4 +124,5 @@ input[type=radio]{
 .send{
     width: 100%;
     background-color: #B8F67B;
+    margin-top: 3vh;
 }

@@ -119,28 +119,25 @@ CREATE TABLE [dbo].[stateChangeOrder] (
     CONSTRAINT [FK_stateChangeOrder_user] FOREIGN KEY ([idUser]) REFERENCES [dbo].[user] ([id])
 );
 
-CREATE TABLE [dbo].[stateChangeUnit] (
-    [id]     INT IDENTITY(1,1) NOT NULL,
-    [idUser] INT NOT NULL,
-    [idUnit] INT NOT NULL,
-    [date]   INT NOT NULL,
-    CONSTRAINT [PK_stateChangeUnit] PRIMARY KEY CLUSTERED ([id] ASC),
-    CONSTRAINT [FK_stateChangeUnit_unit] FOREIGN KEY ([idUnit]) REFERENCES [dbo].[unit] ([id]),
-    CONSTRAINT [FK_stateChangeUnit_user] FOREIGN KEY ([idUser]) REFERENCES [dbo].[user] ([id])
+
+CREATE TABLE [dbo].[payment] (
+    [id]       INT NOT NULL,
+    [date]     INT NOT NULL,
+    [idOrder]  INT NOT NULL,
+    [idClient] INT NOT NULL,
+    [idImage]  INT NOT NULL,
+    CONSTRAINT [PK_payment] PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [FK_payment_client] FOREIGN KEY ([idClient]) REFERENCES [dbo].[client] ([id]),
+    CONSTRAINT [FK_payment_image] FOREIGN KEY ([idImage]) REFERENCES [dbo].[image] ([id]),
+    CONSTRAINT [FK_payment_order] FOREIGN KEY ([idOrder]) REFERENCES [dbo].[order] ([id])
 );
 
-GO
-
-INSERT INTO [dbo].[neckType] ([name])
-VALUES ('Redondo'),('V'),('Polo');
-
-INSERT INTO [dbo].[size] ([name])
-VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
-
-INSERT INTO [dbo].[state] ([name])
-VALUES ('En fabricación'),('Entregado'),('Listo');
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+-- Stored procedures
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 GO
+
 CREATE PROCEDURE [dbo].[create_order]
 	@inName VARCHAR (64)
     , @inPhone VARCHAR (16)
@@ -203,6 +200,7 @@ BEGIN
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
+
 GO
 
 CREATE PROCEDURE [dbo].[read_orders_by_phone]
@@ -228,6 +226,7 @@ SET NOCOUNT OFF;
 END;
 
 GO
+
 CREATE PROCEDURE [dbo].[read_order_by_id]
 	@outResultCode INT OUTPUT
     , @inId INT
@@ -273,6 +272,7 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
+
 GO
 
 CREATE PROCEDURE [dbo].[read_image_by_id]
@@ -289,9 +289,9 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
-GO
 
 GO
+
 CREATE PROCEDURE [dbo].[update_client]
 	@inNewname VARCHAR (64)
     , @inNewDirection VARCHAR (128)
@@ -315,6 +315,7 @@ SET NOCOUNT OFF;
 END;
 
 GO
+
 CREATE PROCEDURE [dbo].[update_unit]
 	@inNewSize VARCHAR (5)
     , @inNewNecktType VARCHAR (16)
@@ -346,9 +347,9 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
-GO
 
 GO
+
 CREATE PROCEDURE [dbo].[upload_second_payment]
     @inImgSecondPayment VARCHAR (MAX)
     , @inId INT
@@ -375,9 +376,9 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
-GO
 
 GO
+
 CREATE PROCEDURE [dbo].[delete_order]
 	@outResultCode INT OUTPUT
     , @inId INT
@@ -415,9 +416,9 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
-GO
 
 GO
+
 CREATE PROCEDURE [dbo].[delete_image]
 	@outResultCode INT OUTPUT
     , @inId INT
@@ -431,10 +432,9 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
-GO
-
 
 GO
+
 CREATE PROCEDURE [dbo].[login]
     @inPassword VARCHAR (16)
     , @inName VARCHAR (16)
@@ -450,10 +450,9 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
-GO
-
 
 GO
+
 CREATE PROCEDURE [dbo].[read_orders_pending]
 	@outResultCode INT OUTPUT
 AS
@@ -465,7 +464,7 @@ SET NOCOUNT ON;
     FROM dbo.[state] 
     WHERE name = 'Entregado'
 
-    SELECT a.id, i.[image], c.phone
+    SELECT a.id, i.[image], c.phone, a.date
     FROM dbo.[order] a
     INNER JOIN dbo.[image] i ON a.idImgDesign = i.id
     INNER JOIN dbo.[client] c ON a.idClient = c.id
@@ -474,6 +473,37 @@ SET NOCOUNT ON;
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
+
 GO
 
+CREATE PROCEDURE [dbo].[read_clients]
+	@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
 
+    SELECT name, phone, direction
+    FROM dbo.client
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+-- Data
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+GO
+
+INSERT INTO [dbo].[neckType] ([name])
+VALUES ('Redondo'),('V'),('Polo');
+
+INSERT INTO [dbo].[size] ([name])
+VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
+
+INSERT INTO [dbo].[state] ([name])
+VALUES ('En fabricación'),('Entregado'),('Listo');
+
+INSERT INTO [dbo].[user] ([name], password)
+VALUES ('admin', 'admin');

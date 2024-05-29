@@ -1,8 +1,8 @@
 .scrollable{
-  padding: 5vh 5vw;
+  padding: 1vh 5vw;
   overflow: scroll;
   position:fixed;
-  height: 80%;
+  height: 85%;
   width: 90%;
 }
 
@@ -55,7 +55,6 @@ label{
 .question{
   border-top: solid rgba(0, 0, 0, 0.106);
   display: grid;
-  margin-bottom: 3vh;
   padding-top: 3vh;
 }
 
@@ -86,12 +85,15 @@ label{
 #totalPaymentDiv{
   display: none;
 }
+
 #firstPaymentDiv{
   display: none;
 }
+
 #secondPaymentDiv{
   display: none;
 }
+
 #sendOrderBtn{
   width: 95%;
   background-color: rgb(184, 246, 123);
@@ -99,6 +101,7 @@ label{
   margin-top: 3vh;
   justify-content: center;
 }
+
 #unitLabel{
   display: none;
 }

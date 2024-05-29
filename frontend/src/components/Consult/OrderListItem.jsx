@@ -26,55 +26,43 @@ export const OrderListItem = (props) => {
         window.location.replace(`http://localhost:3000/consult/${props.phone}`)
     }
 
-    return <div id= "orderListItem">
-        <div id="order">
-            <div id="orderImgList">
-                <p className="info" id="date">{props.date}</p> 
-                <img src={props.image} alt="Design"></img>
-            </div>
-            <div id="info">
-                <div className="data itemData" id="total">
-                    <label>Monto pendiente:</label>
-                    <p>{props.total}</p>
-                </div>
-                <div className="data itemData" id="state">
-                    <label>Estado:</label>
-                    <p>{props.state}</p>
-                </div>
-                <div className="data itemData" id="code">
-                    <label>Codigo:</label>
-                    <p>{props.code}</p>
-                </div>
-            </div>
+    return (
+<div id= "orderListItem">
+    <label>{props.state}</label>
+    <div id="order">
+        <div id="orderImgList">
+            <p className="info" id="date">{props.date}</p> 
+            <img src={props.image} alt="Design"></img>
+            <p>Monto pendiente: ₡{props.total}</p>
+            <p>Codigo {props.code}</p>
         </div>
         <div id="buttons">
-        <button onClick={getOrder} id="getBtn"><i class="fa-solid fa-eye"></i></button>
-        <Popup trigger={<button onClick={deleteOrder} id="delBtn"><i class="fa-solid fa-trash-can"></i></button>} modal nested>
-    
-    {close => (
-        <div className="modal">
-            <button className="close" onClick={close}>&times;</button>
-            <div className="content">
-                <p>Porfavor indicanos la razon por la cual desea eliminar su orden: </p>
-                <div className="option">
-                    <input type="radio" name="option" value="1"/>
-                    <label> Mucho tiempo de espera</label>
+            <button onClick={getOrder} id="getBtn"><i class="fa-solid fa-eye"></i></button>
+            <Popup trigger={<button onClick={deleteOrder} id="delBtn"><i class="fa-solid fa-trash-can"></i></button>} modal nested>
+            {close => (
+            <div className="modal">
+                <button className="close" onClick={close}>&times;</button>
+                <div className="content">
+                    <p>Porfavor indicanos la razon por la cual desea eliminar su orden: </p>
+                    <div className="option">
+                        <input type="radio" name="option" value="1"/>
+                        <label> Mucho tiempo de espera</label>
+                    </div>
+                    <div className="option">
+                        <input type="radio"  name="option" value="2"/>
+                        <label> Encontre una mejor oferta</label>
+                    </div>
+                    <div className="option">
+                        <input type="radio" name="option" value="3"/>
+                        <label> Ya no quiero comprar </label>
+                    </div>
                 </div>
-                <div className="option">
-                    <input type="radio"  name="option" value="2"/>
-                    <label> Encontre una mejor oferta</label>
-                </div>
-                <div className="option">
-                    <input type="radio" name="option" value="3"/>
-                    <label> Ya no quiero comprar </label>
-                </div>
-                
+                <button className="send" onClick= {sendCancelation}>Enviar</button>
             </div>
-            <button className="send" onClick= {sendCancelation}>Enviar</button>
+            )}
+            </Popup>
         </div>
-    )}</Popup>
-    
-        </div>
-  </div>
-  };
+    </div>
+</div>
+)};
   

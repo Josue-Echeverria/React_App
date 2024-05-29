@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from 'react-router-dom';
 import { OrderListItem } from "./OrderListItem";
 import { get } from "../../endpoints";
 import "./OrderList.css"
@@ -20,7 +19,7 @@ export const OrderList = () => {
     };
 
     fetchData(); // Call the async function
-  }, []); // Dependency array ensures it runs when 'phone' changes
+  }, []); 
 
   
   return <div>
@@ -32,7 +31,7 @@ export const OrderList = () => {
           code={item.id} 
           date={item.date.substring(0, 10)} 
           image={item.image} 
-          state={item.name} />
+          state={item.state} />
         ))}
       </ul>
     )}

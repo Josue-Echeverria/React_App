@@ -10,7 +10,6 @@ img{
     max-height: 100%;
     height: auto;
     width: 35vw
-    
 }
 
 #info{
@@ -54,6 +53,13 @@ img{
     padding-bottom: 2vh;
 }
 
+#orderListItem label{
+    color: white;
+    background-color: #0f172a;
+    padding-top: 2vh;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.412);
+}
+
 #options{
     display: flex;
     flex-direction: column;
@@ -61,17 +67,25 @@ img{
 
 #orderImgList{
     width: 100vw;
+    border: solid black 1px;
 }
 
-button{
-    text-align: center;
-    flex: 1;
-    margin: 6px;
+#orderImgList * {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
 }
 
 #buttons{
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
+    padding-top: 10vh;
+    height: 30vh;
+    width: 70vw;
+}
+
+#buttons button{
+    height: 10vh;
 }
 
 #getBtn{

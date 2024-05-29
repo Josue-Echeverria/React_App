@@ -1,4 +1,3 @@
-
 input:disabled{
     color: rgba(0, 0, 0, 0.614);
     box-shadow: 0px 0px 0px;
@@ -23,6 +22,9 @@ button:disabled{
     width: 90%;
 }
 
+.scrollable label{
+    font-weight: bold;
+}
 
 .data{
     display: flex;
@@ -133,4 +135,38 @@ nav a {
 
 .fa-xmark{
     display: none;
+}
+
+.popup-content {
+    width: 50%;
+}
+
+.modalExclamation {
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    font-size: 4vw;
+}
+
+.modalExclamation p{
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    font-size: 4vw;
+}
+
+.modalExclamation > .content {
+    width: 100%;
+    padding-left: 3vw;
+}
+
+.modalExclamation > .close {
+    position: absolute;
+    display: block;
+    padding: 2px 5px;
+    line-height: 20px;
+    right: -10px;
+    top: -10px;
+    font-size: 24px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #cfcece;
 }

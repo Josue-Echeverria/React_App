@@ -1,8 +1,8 @@
-
 input:disabled{
     color: rgba(0, 0, 0, 0.614);
     box-shadow: 0px 0px 0px;
 }
+
 button:disabled{
     color: rgba(0, 0, 0, 0.614);
     box-shadow: 0px 0px 0px;
@@ -12,6 +12,7 @@ button:disabled{
     width: 10%;
     margin-left: 2vw;
 }
+
 .data input{
     width: 80%;
 }
@@ -23,6 +24,11 @@ button:disabled{
 .fa-check{
     display: none;
 }
+
 .fa-xmark{
     display: none;
+}
+
+#SecondPaymentDiv p{
+    text-align: center;
 }

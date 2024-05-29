@@ -73,6 +73,8 @@ export async function saveUpdate(e){
 export const OrderDetails = () => {
   const { code } = useParams();
   const [data, setData] = useState(null); // Initialize data state
+  const [imgSecondPayment, setimgSecondPayment] = useState(null); 
+  const [inputImgSecondPayment, setinputImgSecondPayment] = useState(null); 
   const handleChange = (event) => {
     setData({...data, name: event.target.value}); // update state when input changes
   };
@@ -93,19 +95,19 @@ export const OrderDetails = () => {
         // If the image of the second payment has been uploaded
         if(order["idImgSecondPayment"] !== null){
           // Show the image
+          setimgSecondPayment(true)
           order["imgSecondPayment"] = (await get(`/image/${order["idImgSecondPayment"]}`))[0]["image"]
-          // hide the input 
-          if(document.querySelector("#uploadFile") !== null)
-            document.querySelector("#uploadFile").style.display = "none"
+        }else{
+          setimgSecondPayment(false)
+          if(order["State"] === "Listo")
+            setinputImgSecondPayment(true)
+          else
+            setinputImgSecondPayment(false)
         }
         
         // Get all the units that referenced the order code
         order["units"] = await get(`/unit/${code}`)
-        order["ImgSecondPayment"] = ""
         setData(order); // Set the data to show everything in the frontend
-        // hide the image 
-        if(document.querySelector("#imgSecondPaymentDiv") !== null)
-          document.querySelector("#imgSecondPaymentDiv").style.display = "none"
 
         const dropbtn = document.querySelector(".dropbtn");
         dropbtn.style.display = "none"
@@ -126,7 +128,7 @@ export const OrderDetails = () => {
     <div className="question" id="date">
       <div className="data" id="date">
         <label>Fecha de creacion: </label>
-        <p className="info">{data.date.substring(0, 10)}</p>
+        <p>{data.date.substring(0, 10)}</p>
       </div>
       <div className="imgDiv">
         <img src={data.imgDesign} alt="Design"></img>
@@ -188,14 +190,20 @@ export const OrderDetails = () => {
       <label>Segundo pago:</label>
       <p> {data.total/2} </p> 
     </div>
-    <div className="question">
-      <label>Comprobante de segundo pago:</label><br/>
-      <div className="">
-        <UploadFile isSecondPayment={true} id={data.id} phone={data.phone} idImgSecondPayment = {data.idImgSecondPayment}/>
+    <div className="question" id="SecondPaymentDiv">
+      {imgSecondPayment ? (<><label>Comprobante de segundo pago:</label><br/>
+      <div>
         <div className="imgDiv" id="imgSecondPaymentDiv">
           <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
         </div>
-      </div>
+      </div></>) : (<>
+        {inputImgSecondPayment ? 
+        (<>
+          <UploadFile isSecondPayment={true} id={data.id} phone={data.phone} idImgSecondPayment = {data.idImgSecondPayment}/>
+        </>):(<>
+          <p>Podra subir el comprobante del segundo pago cuando el pedido este listo</p>
+        </>)}
+      </>)}
     </div>
   </div>)}
 </div>
