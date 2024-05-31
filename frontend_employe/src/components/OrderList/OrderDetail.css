@@ -55,7 +55,7 @@ input{
     border-top: solid rgba(0, 0, 0, 0.106);
     display: grid;
     margin-bottom: 2vh;
-    padding-top: 3vh;
+    padding-top: 2vh;
 }
 
 .imgDiv{
@@ -75,6 +75,8 @@ input{
 }
 
 .payment{
+    border-top: #ffffff;
+    padding-top: 0;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -89,8 +91,14 @@ nav a {
     color: white;
 }
 
+.inputMoney{
+    font-size: large;
+    text-align: right;
+}
+
 #SecondPaymentDiv{
     margin-bottom: 20vh;
+    border-top: #ffffff;
 }
 
 #askSecondPayment{
@@ -111,7 +119,6 @@ nav a {
     box-shadow: 5px 5px 5px gray;
 }
 
-
 #statesSelect:disabled{
     color: rgba(0, 0, 0, 0.614);
     box-shadow: 0px 0px 0px;
@@ -128,7 +135,7 @@ nav a {
 }
 
 
-.fa-check{
+.states .fa-check{
     display: none;
 }
 
@@ -148,7 +155,6 @@ nav a {
 }
 
 .modalExclamation p{
-    width: 100%;
     font-family: "Inter", sans-serif;
     font-size: 4vw;
 }
@@ -169,4 +175,8 @@ nav a {
     background: #ffffff;
     border-radius: 18px;
     border: 1px solid #cfcece;
+}
+
+.fa-check{
+    margin-left: 2vw;
 }

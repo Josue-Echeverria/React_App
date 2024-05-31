@@ -1,10 +1,14 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import "./OrderListItem.css"
-import { del } from "../../endpoints";
+import { del, get } from "../../endpoints";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
 export const OrderListItem = (props) => {
+    const [firstPaymentRecieved, setfirstPaymentRecieved] = useState(null); 
+    const [secondPaymentRecieved, setsecondPaymentRecieved] = useState(null); 
+    const [payment, setPayment] = useState(null); 
+
     function getOrder(){
         window.location.replace(`http://localhost:3000/consult/${props.phone}/${props.code}`)
     }
@@ -25,6 +29,25 @@ export const OrderListItem = (props) => {
         del(`/order/${props.code}/${selected}`)
         window.location.replace(`http://localhost:3000/consult/${props.phone}`)
     }
+    useEffect(() => {
+        const fetchData = async () => {
+            let payments = await get(`/payment/${props.code}`)
+            
+            if(payments.length === 0){
+                setfirstPaymentRecieved(false)
+                setsecondPaymentRecieved(false)
+            }
+            else if(payments.length === 1){
+                setfirstPaymentRecieved(true)
+                setsecondPaymentRecieved(false)
+            } else if (payments.length === 2){
+                setfirstPaymentRecieved(false)
+                setsecondPaymentRecieved(true)
+            }
+            await setPayment(payments);
+        }
+        fetchData();
+    }, []); 
 
     return (
 <div id= "orderListItem">
@@ -33,7 +56,15 @@ export const OrderListItem = (props) => {
         <div id="orderImgList">
             <p className="info" id="date">{props.date}</p> 
             <img src={props.image} alt="Design"></img>
-            <p>Monto pendiente: ₡{props.total}</p>
+            {secondPaymentRecieved ? (
+                <p>Pagado</p>
+                ) : (<>
+                {firstPaymentRecieved ? 
+                (<p>Monto pendiente: ₡{props.total-payment[0]["amount"]}</p>
+                ):(
+                <p>Monto pendiente: Esperando confirmación</p>
+                )}
+            </>)}
             <p>Codigo {props.code}</p>
         </div>
         <div id="buttons">

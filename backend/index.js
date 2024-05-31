@@ -384,7 +384,7 @@ app.put("/update/state/:id", async (req,res) => {
     const {state} = req.body
     const request = new sql.Request();
     request.input('inIdOrder', sql.Int, id);
-    request.input('inState', sql.VarChar(32), state);
+    request.input('inName', sql.VarChar(32), state);
     request.output('outResultCode', sql.Int);
     const result = await request.execute('change_state');
     res.json(result.recordset);
@@ -405,6 +405,49 @@ app.get("/clients", async (req, res) => {
     const request = new sql.Request();
     request.output('outResultCode', sql.Int);
     const result = await request.execute('read_clients');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.get("/payment/:id", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const id = req.params.id
+    request.output('outResultCode', sql.Int);
+    request.input('inId', sql.Int, id);
+    const result = await request.execute('read_payment');
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+app.post("/payment", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const id = req.params.id
+    const {date, amount, code, name, idImgPayment, isFirstPayment} = req.body
+    request.input('inDate', sql.Date, date);
+    request.input('inAmount', sql.Money, amount);
+    request.input('inId', sql.Int, code);
+    request.input('inName', sql.VarChar(32), name);
+    request.input('inIdImg', sql.Int, idImgPayment);
+    request.input('inIsFirstPayment', sql.Bit, isFirstPayment);
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('create_payment');
     res.json(result.recordset);
   } 
   catch (error) {

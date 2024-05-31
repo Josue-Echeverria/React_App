@@ -18,7 +18,7 @@ const states = [('Entregado'),('En fabricación'),('Listo')]
  * It enables the input fields and shows the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-export function update(e){
+function update(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   const statesSelect = document.querySelector("#statesSelect")
@@ -40,7 +40,7 @@ export function update(e){
  * It restores the original values and hides the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-export function cancelUpdate(e){
+function cancelUpdate(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   const statesSelect = document.querySelector("#statesSelect")
@@ -57,34 +57,44 @@ export function cancelUpdate(e){
   childNodes[4].style.display = "none"
 }
 
-
-function askSecondPayment(){
-  const statesSelect = document.querySelector("#statesSelect")
-  if(statesSelect.disabled){
-    alert("Primero debe cambiar el estado del pedido y guardar los cambios")
-    return
-  }
-  let options = statesSelect.childNodes
-  // Sets the state as selected in the frontend
-  for(let i = 0; i<options.length; i++){
-    if(options[i].textContent === "Listo")
-      if(options[i].selected)
-        post()
-      else
-        alert("Verifique que el pedido este listo antes de solicitar el segundo pago") 
-
-  }
-
-}
-
-
 export const OrderDetails = () => {
   const { code } = useParams();
   const [data, setData] = useState(null); 
+  const [firstPaymentRecieved, setfirstPaymentRecieved] = useState(null); 
+  const [secondPaymentRecieved, setSecondPaymentRecieved] = useState(null); 
   const [imgSecondPayment, setimgSecondPayment] = useState(null); 
   const handleChange = (event) => {
     setData({...data, name: event.target.value}); // update state when input changes
   };
+
+  function sendFirstPayment(){
+    let amount = document.querySelector("#inputFirstPayment").value
+    if(amount.length <= 1){
+      alert("El monto digitado no es valido")
+      return
+    }
+    amount = parseInt(amount, 10)
+    const date = data.date
+    const name = data.name
+    const idImgPayment = data.idImgFirstPayment
+    const isFirstPayment = true
+    post("/payment", {date, amount, code, name, idImgPayment, isFirstPayment})
+  }
+
+  function sendSecondPayment(){
+    let amount = document.querySelector("#inputSecondPayment").value
+    if(amount.length <= 1){
+      alert("El monto digitado no es valido")
+      return
+    }
+    amount = parseInt(amount, 10)
+    const date = data.date
+    const name = data.name
+    const idImgPayment = data.idImgFirstPayment
+    const isFirstPayment = false
+    post("/payment", {date, amount, code, name, idImgPayment, isFirstPayment})
+  }
+
 
 
   /**
@@ -135,7 +145,27 @@ export const OrderDetails = () => {
         }else{
           setimgSecondPayment(false)
         }
-        
+
+        const payments = await get(`/payment/${code}`)
+        console.log(payments)
+        if(payments.length === 0){
+          setfirstPaymentRecieved(false)
+          setSecondPaymentRecieved(false)
+        }else{
+          setfirstPaymentRecieved(true)
+          if(payments[0]["isFirstPayment"]){
+            order["firstPaymentRecieved"] = payments[0]["amount"]
+            if(payments[1] !== undefined){
+              order["secondPaymentRecieved"] = payments[0]["amount"]
+              setSecondPaymentRecieved(false)
+            }
+          }else{
+            order["firstPaymentRecieved"] = payments[1]["amount"]
+            order["secondPaymentRecieved"] = payments[0]["amount"]
+            setSecondPaymentRecieved(true)
+          }
+        }
+
         // Get all the units that referenced the order code
         order["units"] = await get(`/unit/${code}`)
         // Gets the current state of the order
@@ -148,6 +178,7 @@ export const OrderDetails = () => {
               options[i].selected = true
           }
         }
+
         setData(order); // Set the data to show everything in the frontend
 
       } catch (error) {
@@ -189,21 +220,7 @@ export const OrderDetails = () => {
       </div>
     </div>
     <div className="question">
-      <div className="">
-        <label>Nombre:</label> 
-        <Popup trigger={<i class="fa-solid fa-circle-exclamation"></i>} nested>
-        {close => (
-        <div className="modalExclamation">
-            <button className="close" onClick={close}>&times;</button>
-            <div className="content">
-                <p>Desea indicar al usuario que el espacio no esta claro</p>
-            </div>
-            <button onClick= {askSecondPayment}>Confirmar</button>
-        </div>
-        )}
-        </Popup>
-      </div>
-
+      <label>Nombre:</label> 
       <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/>
     </div>
     <div className="question">
@@ -229,41 +246,70 @@ export const OrderDetails = () => {
       <label>Total a pagar:</label>
       <p> {data.total} </p> 
     </div>
-    <div className="question payment" >
-      <label>Primer pago:</label>
-      <p> {data.total/2} </p> 
-    </div>
     <div className="question">
       <label>Comprobante de primer pago:</label><br/>
       <div className="imgDiv">
         <img src={data.imgFirstPayment} alt="First Payment"></img>
       </div>
     </div>
-    <div className="question payment">
-      <label>Segundo pago:</label>
-      <p> {data.total/2} </p> 
+    <div className="question payment" >
+      <label>Monto recibido: </label>
+      {firstPaymentRecieved ? 
+      (<p>₡{data.firstPaymentRecieved}</p>
+      ):(
+      <>
+        <input className="inputMoney" id="inputFirstPayment"></input> 
+        <Popup trigger={<i class="fa-solid fa-check"></i>} position={'top right'}>
+          {close => (
+          <div className="modalExclamation">
+              <button className="close" onClick={close}>&times;</button>
+              <div className="content">
+                  <p>Desea indicar al usuario que el espacio no esta claro</p>
+              </div>
+              <button onClick= {sendFirstPayment}>Confirmar</button>
+          </div>
+          )}
+        </Popup>
+      </>)}
     </div>
     <div className="question" id="SecondPaymentDiv">
-      {imgSecondPayment ? (<><label>Comprobante de segundo pago:</label><br/>
-      <div>
-        <div className="imgDiv" id="imgSecondPaymentDiv">
-          <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
-        </div>
-      </div></>) : (<>
-      <Popup trigger={<button id="askSecondPayment">Solicitar segundo pago</button>} modal nested>
-      {close => (
-      <div className="modal">
-          <button className="close" onClick={close}>&times;</button>
-          <div className="content">
-              <p>Indique cuanto debe de pagar el cliente en el segundo pago: </p>
-              <input id="secondPaymentAmount"></input>
+      {imgSecondPayment ? (
+      <>
+        <div className="question" >
+          <label>Comprobante de segundo pago:</label><br/>
+          <div className="imgDiv" id="imgSecondPaymentDiv">
+            <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
           </div>
-          <button className="send" onClick= {askSecondPayment}>Enviar</button>
-      </div>
-      )}
-      </Popup></>)}
-      
+        </div>
+        <div className="question payment" >
+          <label>Monto recibido: </label>
+          <input className="inputMoney" id="inputFirstPayment"></input> 
+          <Popup trigger={<i class="fa-solid fa-check"></i>} position={'top right'}>
+            {close => (
+            <div className="modalExclamation">
+                <button className="close" onClick={close}>&times;</button>
+                <div className="content">
+                    <p>Desea indicar al usuario que el espacio no esta claro</p>
+                </div>
+                <button onClick= {sendFirstPayment}>Confirmar</button>
+            </div>
+            )}
+          </Popup>
+        </div>
+      </>) : (
+      <>      
+        <div className="question payment">
+          <label>Monto pendiente:</label>
+          <p>₡{data.total-data.firstPaymentRecieved} </p> 
+        </div>
+      </>)}
     </div>
+    {secondPaymentRecieved ? (
+    <div className="question payment" >    
+      <label>Monto recibido: </label>
+      <p>₡{data.secondPaymentRecieved}</p>
+    </div>
+    ):(<></>)}
   </div>)}
 </div>
   

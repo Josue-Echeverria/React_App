@@ -73,7 +73,10 @@ export async function saveUpdate(e){
 export const OrderDetails = () => {
   const { code } = useParams();
   const [data, setData] = useState(null); // Initialize data state
-  const [imgSecondPayment, setimgSecondPayment] = useState(null); 
+  const [orderReady, setOrderReady] = useState(null); // Initialize data state
+
+  const [secondPaymentReceived, setSecondPaymentReceived] = useState(null); 
+  const [firstPaymentReceived, setFirstPaymentReceived] = useState(null); 
   const [inputImgSecondPayment, setinputImgSecondPayment] = useState(null); 
   const handleChange = (event) => {
     setData({...data, name: event.target.value}); // update state when input changes
@@ -92,17 +95,26 @@ export const OrderDetails = () => {
         order["imgDesign"] = (await get(`/image/${order["idImgDesign"]}`))[0]["image"]
         order["imgFirstPayment"] = (await get(`/image/${order["idImgFirstPayment"]}`))[0]["image"]
 
-        // If the image of the second payment has been uploaded
-        if(order["idImgSecondPayment"] !== null){
-          // Show the image
-          setimgSecondPayment(true)
-          order["imgSecondPayment"] = (await get(`/image/${order["idImgSecondPayment"]}`))[0]["image"]
-        }else{
-          setimgSecondPayment(false)
-          if(order["State"] === "Listo")
-            setinputImgSecondPayment(true)
-          else
-            setinputImgSecondPayment(false)
+        const payments = (await get(`/payment/${code}`))
+        if(payments.length === 0){
+          setFirstPaymentReceived(false)
+        }else if (payments.length >= 1){
+          order["firstPayment"] = payments[0]["amount"]
+          setFirstPaymentReceived(true)
+          if(order["state"] === "Listo"){
+            setOrderReady(true)
+            if(order["idImgSecondPayment"] === null){
+              setinputImgSecondPayment(true)
+            }else{
+              setinputImgSecondPayment(false)
+              order["imgSecondPayment"] = (await get(`/image/${order["idImgSecondPayment"]}`))[0]["image"]
+              if(payments.length === 2){
+                setSecondPaymentReceived(true)
+              }else{
+                setSecondPaymentReceived(false)
+              }
+            }
+          }
         }
         
         // Get all the units that referenced the order code
@@ -174,11 +186,16 @@ export const OrderDetails = () => {
 
     <div className="question data" id="total">
       <label>Total a pagar:</label>
-      <p> {data.total} </p> 
+      <p> ₡{data.total} </p> 
     </div>
     <div className="question data" >
       <label>Primer pago:</label>
-      <p> {data.total/2} </p> 
+      {firstPaymentReceived ? 
+      (
+        <p>₡{data.firstPayment}</p> 
+      ) : (
+        <p>Esperando confirmación</p>
+      )}
     </div>
     <div className="question">
       <label>Comprobante de primer pago:</label><br/>
@@ -186,26 +203,47 @@ export const OrderDetails = () => {
         <img src={data.imgFirstPayment} alt="First Payment"></img>
       </div>
     </div>
-    <div className="question data">
-      <label>Segundo pago:</label>
-      <p> {data.total/2} </p> 
-    </div>
-    <div className="question" id="SecondPaymentDiv">
-      {imgSecondPayment ? (<><label>Comprobante de segundo pago:</label><br/>
-      <div>
-        <div className="imgDiv" id="imgSecondPaymentDiv">
-          <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
+
+    {orderReady ? (
+    <>
+      {inputImgSecondPayment ? (
+      <>
+        <div className="question data">
+          <label>Monto pendiente:</label>
+          <p> ₡{data.total-data.firstPayment} </p> 
         </div>
-      </div></>) : (<>
-        {inputImgSecondPayment ? 
-        (<>
+        <div className="question">
+          <label>Comprobante de segundo pago:</label><br/>
           <UploadFile isSecondPayment={true} id={data.id} phone={data.phone} idImgSecondPayment = {data.idImgSecondPayment}/>
-        </>):(<>
-          <p>Podra subir el comprobante del segundo pago cuando el pedido este listo</p>
+        </div>
+      </>
+      ) : (
+      <>
+        {secondPaymentReceived ? (
+        <>
+          <div className="question data">
+            <label>Segundo pago: </label>
+            <p> ₡{data.total-data.firstPayment} </p> 
+          </div>
+        </>) : (
+        <>
+          <div className="question data">
+            <label>Segundo pago:</label>
+            <p>Esperando confirmación</p>
+          </div>
         </>)}
-      </>)}
-    </div>
-  </div>)}
+        <div className="question">
+          <label>Comprobante de segundo pago:</label><br/>
+          <div className="imgDiv" id="imgSecondPaymentDiv">
+            <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
+          </div>
+        </div>
+      </>)}  
+    </>) : (
+      <p>Podra subir el comprobante del segundo pago cuando el pedido este listo</p>
+    )}
+  </div>
+  )}
 </div>
   
 };

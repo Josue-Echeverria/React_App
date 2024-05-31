@@ -121,11 +121,13 @@ CREATE TABLE [dbo].[stateChangeOrder] (
 
 
 CREATE TABLE [dbo].[payment] (
-    [id]       INT NOT NULL,
-    [date]     INT NOT NULL,
-    [idOrder]  INT NOT NULL,
-    [idClient] INT NOT NULL,
-    [idImage]  INT NOT NULL,
+    [id]             INT   IDENTITY (1, 1) NOT NULL,
+    [date]           DATE  NOT NULL,
+    [idOrder]        INT   NOT NULL,
+    [idClient]       INT   NOT NULL,
+    [idImage]        INT   NOT NULL,
+    [amount]         MONEY NOT NULL,
+    [isFirstPayment] BIT   NOT NULL,
     CONSTRAINT [PK_payment] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_payment_client] FOREIGN KEY ([idClient]) REFERENCES [dbo].[client] ([id]),
     CONSTRAINT [FK_payment_image] FOREIGN KEY ([idImage]) REFERENCES [dbo].[image] ([id]),
@@ -233,6 +235,9 @@ CREATE PROCEDURE [dbo].[read_order_by_id]
 AS
 BEGIN
 SET NOCOUNT ON;
+
+
+
     SELECT o.id
     ,o.[date]
     , b.name AS state
@@ -464,10 +469,15 @@ SET NOCOUNT ON;
     FROM dbo.[state] 
     WHERE name = 'Entregado'
 
-    SELECT a.id, i.[image], c.phone, a.date
+    SELECT a.id
+    , i.[image]
+    , c.phone
+    , a.date
+    , s.name AS state
     FROM dbo.[order] a
     INNER JOIN dbo.[image] i ON a.idImgDesign = i.id
     INNER JOIN dbo.[client] c ON a.idClient = c.id
+    INNER JOIN dbo.[state] s ON a.idState = s.id
     WHERE a.idState != @idDelivered;
 
     SET @outResultCode=0;
@@ -475,6 +485,23 @@ SET NOCOUNT OFF;
 END;
 
 GO
+
+CREATE PROCEDURE [dbo].[read_payment]
+    @inId INT
+	,@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    SELECT amount, isFirstPayment
+    FROM dbo.payment
+    WHERE @inId = idOrder
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO 
 
 CREATE PROCEDURE [dbo].[read_clients]
 	@outResultCode INT OUTPUT
@@ -489,6 +516,87 @@ SET NOCOUNT ON;
 SET NOCOUNT OFF;
 END;
 
+GO 
+
+CREATE PROCEDURE [dbo].[create_payment]
+    @inDate Date 
+    ,@inAmount Money 
+    ,@inId Int 
+    ,@inName VarChar(32)
+    ,@inIdImg Int 
+    ,@inIsFirstPayment Bit 
+	,@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idClient INT;
+
+    SELECT @idClient = id 
+    FROM dbo.client 
+    WHERE @inName = name
+
+    INSERT INTO dbo.payment (
+        [date]
+        , amount
+        , idOrder
+        , idClient
+        , idImage
+        , isFirstPayment) 
+    VALUES (
+        @inDate
+        , @inAmount
+        , @inId
+        , @idClient
+        , @inIdImg
+        , @inIsFirstPayment
+        );
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO 
+
+CREATE PROCEDURE [dbo].[read_payment]
+    @inId Int 
+	,@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idClient INT;
+
+    SELECT amount, isFirstPayment 
+    FROM dbo.payment 
+    WHERE @inId = idOrder
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO 
+
+CREATE PROCEDURE [dbo].[change_state]
+    @inName VarChar(32) 
+    ,@inIdOrder Int 
+	,@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idState INT;
+
+    SELECT @idState = id
+    FROM dbo.State
+    WHERE @inName = name
+
+    UPDATE dbo.[order]
+    SET idState = @idState
+    WHERE @inIdOrder = id
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO 
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- Data
