@@ -377,7 +377,7 @@ app.get("/orders", async (req, res) => {
 });
 
 
-app.put("/update/state/:id", async (req,res) => {
+app.put("/update/:id/state", async (req,res) => {
   try{
     await sql.connect(config);
     const id = req.params.id
@@ -434,6 +434,7 @@ app.get("/payment/:id", async (req, res) => {
   }
 });
 
+
 app.post("/payment", async (req, res) => {
   try{
     await sql.connect(config);
@@ -450,6 +451,85 @@ app.post("/payment", async (req, res) => {
     const result = await request.execute('create_payment');
     res.json(result.recordset);
   } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.post("/order/:id/cancel", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const id = req.params.id
+    const {reason, date} = req.body
+    request.output('outResultCode', sql.Int);
+    request.input('inId', sql.Int, id);
+    request.input('inDate', sql.Date, date);
+    request.input('inReason', sql.VarChar(64), reason);
+    const result = await request.execute('create_cancelation');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.get("/order/:id/cancel/reason", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const id = req.params.id
+    request.output('outResultCode', sql.Int);
+    request.input('inId', sql.Int, id);
+    const result = await request.execute('read_reason');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.put("/order/cancel/:id/reject", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const id = req.params.id
+    request.output('outResultCode', sql.Int);
+    request.input('inId', sql.Int, id);
+    const result = await request.execute('reject_cancelation');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.put("/order/cancel/:id/accept", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const id = req.params.id
+    request.output('outResultCode', sql.Int);
+    request.input('inId', sql.Int, id);
+    const result = await request.execute('accept_cancelation');
+    res.json(result.recordset);
+  }
   catch (error) {
     console.error(error);
     res.status(500).send('Error fetching data.');

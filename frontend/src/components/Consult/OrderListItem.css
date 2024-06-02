@@ -54,9 +54,9 @@ img{
 }
 
 #orderListItem label{
-    color: white;
-    background-color: #0f172a;
-    padding-top: 2vh;
+    background-color: #B8F67B;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
     border-bottom: 2px solid rgba(0, 0, 0, 0.412);
 }
 
@@ -92,7 +92,7 @@ img{
  background-color:#B8F67B
 }
 
-#delBtn{
+.delBtn{
  background-color:rgb(255, 112, 112)
 }
 
@@ -147,6 +147,7 @@ input[type=radio]{
 .option{
     padding-bottom: 2vh;
     width: 93%;
+    align-items: baseline;
 }
 
 .option label{

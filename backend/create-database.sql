@@ -16,12 +16,13 @@ CREATE TABLE [dbo].[client] (
     [name]      VARCHAR (64)  NOT NULL,
     [phone]     VARCHAR (16)  NOT NULL,
     [direction] VARCHAR (128) NOT NULL,
+    [active]    BIT           NOT NULL,
     CONSTRAINT [PK_client] PRIMARY KEY CLUSTERED ([id] ASC),
 );
 
 CREATE TABLE [dbo].[state] (
     [id]   INT IDENTITY(1,1) NOT NULL,
-    [name] VARCHAR (16) NOT NULL,
+    [name] VARCHAR (32) NOT NULL,
     CONSTRAINT [PK_state] PRIMARY KEY CLUSTERED ([id] ASC)
 );
 
@@ -104,6 +105,7 @@ CREATE TABLE [dbo].[unit] (
     CONSTRAINT [FK_unit_state] FOREIGN KEY ([idState]) REFERENCES [dbo].[state] ([id])
 );
 
+GO
 
 CREATE TABLE [dbo].[stateChangeOrder] (
     [id]              INT IDENTITY(1,1) NOT NULL,
@@ -119,6 +121,7 @@ CREATE TABLE [dbo].[stateChangeOrder] (
     CONSTRAINT [FK_stateChangeOrder_user] FOREIGN KEY ([idUser]) REFERENCES [dbo].[user] ([id])
 );
 
+GO
 
 CREATE TABLE [dbo].[payment] (
     [id]             INT   IDENTITY (1, 1) NOT NULL,
@@ -132,6 +135,28 @@ CREATE TABLE [dbo].[payment] (
     CONSTRAINT [FK_payment_client] FOREIGN KEY ([idClient]) REFERENCES [dbo].[client] ([id]),
     CONSTRAINT [FK_payment_image] FOREIGN KEY ([idImage]) REFERENCES [dbo].[image] ([id]),
     CONSTRAINT [FK_payment_order] FOREIGN KEY ([idOrder]) REFERENCES [dbo].[order] ([id])
+);
+
+GO
+
+CREATE TABLE [dbo].[reason] (
+    [id]   INT IDENTITY(1,1) NOT NULL,
+    [name] VARCHAR (64) NOT NULL,
+    CONSTRAINT [PK_reason] PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+GO
+
+CREATE TABLE [dbo].[cancelation] (
+    [id]       INT  IDENTITY (1, 1) NOT NULL,
+    [idOrder]  INT  NOT NULL,
+    [idState]  INT  NOT NULL,
+    [date]     DATE NOT NULL,
+    [idReason] INT  NOT NULL,
+    CONSTRAINT [PK_cancelation] PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [FK_cancelation_order] FOREIGN KEY ([idOrder]) REFERENCES [dbo].[order] ([id]),
+    CONSTRAINT [FK_cancelation_reason] FOREIGN KEY ([idReason]) REFERENCES [dbo].[reason] ([id]),
+    CONSTRAINT [FK_cancelation_state] FOREIGN KEY ([idState]) REFERENCES [dbo].[state] ([id])
 );
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
@@ -464,10 +489,15 @@ AS
 BEGIN
 SET NOCOUNT ON;
     DECLARE @idDelivered INT;
+    DECLARE @idCanceled INT;
     
     SELECT @idDelivered = id 
     FROM dbo.[state] 
-    WHERE name = 'Entregado'
+    WHERE name = 'Entregado';
+    
+    SELECT @idCanceled = id 
+    FROM dbo.[state] 
+    WHERE name = 'Cancelada';
 
     SELECT a.id
     , i.[image]
@@ -478,7 +508,8 @@ SET NOCOUNT ON;
     INNER JOIN dbo.[image] i ON a.idImgDesign = i.id
     INNER JOIN dbo.[client] c ON a.idClient = c.id
     INNER JOIN dbo.[state] s ON a.idState = s.id
-    WHERE a.idState != @idDelivered;
+    WHERE a.idState != @idDelivered
+    AND a.idState != @idCanceled;
 
     SET @outResultCode=0;
 SET NOCOUNT OFF;
@@ -557,24 +588,6 @@ END;
 
 GO 
 
-CREATE PROCEDURE [dbo].[read_payment]
-    @inId Int 
-	,@outResultCode INT OUTPUT
-AS
-BEGIN
-SET NOCOUNT ON;
-    DECLARE @idClient INT;
-
-    SELECT amount, isFirstPayment 
-    FROM dbo.payment 
-    WHERE @inId = idOrder
-
-    SET @outResultCode=0;
-SET NOCOUNT OFF;
-END;
-
-GO 
-
 CREATE PROCEDURE [dbo].[change_state]
     @inName VarChar(32) 
     ,@inIdOrder Int 
@@ -596,7 +609,108 @@ SET NOCOUNT ON;
 SET NOCOUNT OFF;
 END;
 
-GO 
+GO
+
+CREATE PROCEDURE [dbo].[create_cancelation]
+	@outResultCode INT OUTPUT
+    , @inId INT
+    , @inDate DATE
+    , @inReason VARCHAR (64)
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idState INT;
+    DECLARE @idReason INT;
+
+    SELECT @idState = id
+    FROM dbo.[state] 
+    WHERE name = 'Procesando';
+	
+    SELECT @idReason = id
+    FROM dbo.[reason] 
+    WHERE name = @inReason;
+
+    INSERT INTO dbo.cancelation (
+        idOrder
+        , idState
+        , [date]
+        , idReason)
+    VALUES (
+        @inId
+        ,@idState
+        ,@inDate
+        ,@idReason);
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_reason]
+	@outResultCode INT OUTPUT
+    , @inId INT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    SELECT TOP 1 r.name, c.id
+    FROM dbo.[cancelation] c
+    INNER JOIN dbo.[reason] r ON c.idReason = r.id
+    WHERE idOrder = @inId
+    ORDER BY c.[date] DESC;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[reject_cancelation]
+	@outResultCode INT OUTPUT
+    , @inId INT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    DECLARE @idState INT; 
+
+    SELECT @idState = id 
+    FROM dbo.[state] 
+    WHERE name = 'Rechazada';
+
+    UPDATE dbo.cancelation
+    SET idState = @idState
+    WHERE id = @inId;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[accept_cancelation]
+	@outResultCode INT OUTPUT
+    , @inId INT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    DECLARE @idState INT; 
+
+    SELECT @idState = id 
+    FROM dbo.[state] 
+    WHERE name = 'Aceptada';
+
+    UPDATE dbo.cancelation
+    SET idState = @idState
+    WHERE id = @inId;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- Data
@@ -611,7 +725,10 @@ INSERT INTO [dbo].[size] ([name])
 VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
 
 INSERT INTO [dbo].[state] ([name])
-VALUES ('En fabricación'),('Entregado'),('Listo');
+VALUES ('En fabricación'),('Entregado'),('Listo'),('Cancelando'),('Cancelada'),('Procesando'),('Aceptada'),('Rechazada');
+
+INSERT INTO [dbo].[reason] ([name])
+VALUES ('Contenido inapropiado'),('Información confusa'),('Falta de información'),('Mucho tiempo de espera'),('Encontré una mejor oferta'),('Ya no quiero comprar');
 
 INSERT INTO [dbo].[user] ([name], password)
 VALUES ('admin', 'admin');

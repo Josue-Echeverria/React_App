@@ -53,9 +53,9 @@ label{
 
 
 .question{
-  border-top: solid rgba(0, 0, 0, 0.106);
   display: grid;
   padding-top: 3vh;
+  border-top: solid rgba(0, 0, 0, 0.106)
 }
 
 .payment{

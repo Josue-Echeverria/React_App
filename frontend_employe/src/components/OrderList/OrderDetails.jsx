@@ -79,6 +79,7 @@ export const OrderDetails = () => {
     const idImgPayment = data.idImgFirstPayment
     const isFirstPayment = true
     post("/payment", {date, amount, code, name, idImgPayment, isFirstPayment})
+    window.location.reload();
   }
 
   function sendSecondPayment(){
@@ -93,6 +94,7 @@ export const OrderDetails = () => {
     const idImgPayment = data.idImgFirstPayment
     const isFirstPayment = false
     post("/payment", {date, amount, code, name, idImgPayment, isFirstPayment})
+    window.location.reload();
   }
 
 
@@ -147,7 +149,6 @@ export const OrderDetails = () => {
         }
 
         const payments = await get(`/payment/${code}`)
-        console.log(payments)
         if(payments.length === 0){
           setfirstPaymentRecieved(false)
           setSecondPaymentRecieved(false)
@@ -156,8 +157,8 @@ export const OrderDetails = () => {
           if(payments[0]["isFirstPayment"]){
             order["firstPaymentRecieved"] = payments[0]["amount"]
             if(payments[1] !== undefined){
-              order["secondPaymentRecieved"] = payments[0]["amount"]
-              setSecondPaymentRecieved(false)
+              order["secondPaymentRecieved"] = payments[1]["amount"]
+              setSecondPaymentRecieved(true)
             }
           }else{
             order["firstPaymentRecieved"] = payments[1]["amount"]
@@ -244,7 +245,7 @@ export const OrderDetails = () => {
 
     <div className="question payment" id="total">
       <label>Total a pagar:</label>
-      <p> {data.total} </p> 
+      <p> ₡{data.total} </p> 
     </div>
     <div className="question">
       <label>Comprobante de primer pago:</label><br/>
@@ -273,6 +274,20 @@ export const OrderDetails = () => {
       </>)}
     </div>
     <div className="question" id="SecondPaymentDiv">
+    {secondPaymentRecieved ? (
+    <>
+      <div className="question" >
+        <label>Comprobante de segundo pago:</label><br/>
+        <div className="imgDiv" id="imgSecondPaymentDiv">
+          <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
+        </div>
+      </div>
+      <div className="question payment" >    
+        <label>Monto recibido: </label>
+        <p>₡{data.secondPaymentRecieved}</p>
+      </div>
+    </>
+    ):(<>
       {imgSecondPayment ? (
       <>
         <div className="question" >
@@ -283,33 +298,30 @@ export const OrderDetails = () => {
         </div>
         <div className="question payment" >
           <label>Monto recibido: </label>
-          <input className="inputMoney" id="inputFirstPayment"></input> 
+          <input className="inputMoney" id="inputSecondPayment"></input> 
           <Popup trigger={<i class="fa-solid fa-check"></i>} position={'top right'}>
             {close => (
             <div className="modalExclamation">
                 <button className="close" onClick={close}>&times;</button>
                 <div className="content">
-                    <p>Desea indicar al usuario que el espacio no esta claro</p>
+                    <p>Desea guardar el pago del cliente</p>
                 </div>
-                <button onClick= {sendFirstPayment}>Confirmar</button>
+                <button onClick= {sendSecondPayment}>Confirmar</button>
             </div>
             )}
           </Popup>
         </div>
       </>) : (
-      <>      
-        <div className="question payment">
-          <label>Monto pendiente:</label>
-          <p>₡{data.total-data.firstPaymentRecieved} </p> 
-        </div>
-      </>)}
+        firstPaymentRecieved ? (
+        <>      
+          <div className="question payment">
+            <label>Monto pendiente:</label>
+            <p>₡{data.total-data.firstPaymentRecieved} </p> 
+          </div>
+        </>) : (<></>)
+      )}
+    </>)}
     </div>
-    {secondPaymentRecieved ? (
-    <div className="question payment" >    
-      <label>Monto recibido: </label>
-      <p>₡{data.secondPaymentRecieved}</p>
-    </div>
-    ):(<></>)}
   </div>)}
 </div>
   

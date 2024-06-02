@@ -18,11 +18,11 @@ img{
 }
 
 #orderListItem label{
-    color: white;
     font-weight: bold;
-    background-color: #0f172a;
-    padding-top: 2vh;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.412);
+    background-color: #B8F67B;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    border-bottom: 2px solid ;
 }
 
 #orderListItem{
@@ -57,29 +57,33 @@ img{
     height: 10vh;
 }
 
-#getBtn{
+.getBtn{
  background-color:#B8F67B
 }
 
-#delBtn{
+.delBtn{
  background-color:rgb(255, 112, 112)
 }
 
 .modal {
     width: 96%;
     font-family: "Inter", sans-serif;
-    font-size: 4vw;
+    font-size: 5vw;
 }
 
-.modal p{
-    width: 96%;
-    font-family: "Inter", sans-serif;
-    font-size: 4vw;
-}
 
 .modal > .content {
     width: 100%;
     padding-left: 3vw;
+}
+
+.content label{
+    font-weight: bold;
+    margin-top: 2vh;
+}
+
+.content{
+    padding-top: 2vh;
 }
 
 .modal > .close {
@@ -99,6 +103,7 @@ input[type=radio]{
     margin-bottom: 0vh;
     padding-bottom: 0vh;
     height: 2vh;
+    width: 2vh;
     position: relative;
     left: 0;
     border-radius: 10px;
@@ -110,19 +115,18 @@ input[type=radio]{
     margin: auto;
     background: rgb(255, 255, 255);
     padding: 5px;
+    width: 90%;
   }
 
 .option{
     padding-bottom: 2vh;
     width: 93%;
-}
-
-.option label{
-    margin-top: 5vh;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
 }
 
 .send{
     width: 100%;
-    background-color: #B8F67B;
     margin-top: 3vh;
 }

@@ -72,8 +72,9 @@ export async function saveUpdate(e){
 
 export const OrderDetails = () => {
   const { code } = useParams();
-  const [data, setData] = useState(null); // Initialize data state
-  const [orderReady, setOrderReady] = useState(null); // Initialize data state
+  const [data, setData] = useState(null);
+  const [orderReady, setOrderReady] = useState(null); 
+  const [orderCanceling, setOrderCanceling] = useState(null); 
 
   const [secondPaymentReceived, setSecondPaymentReceived] = useState(null); 
   const [firstPaymentReceived, setFirstPaymentReceived] = useState(null); 
@@ -114,9 +115,12 @@ export const OrderDetails = () => {
                 setSecondPaymentReceived(false)
               }
             }
-          }
+          } 
         }
-        
+        if(order["state"] === "Cancelando" || order["state"] === "Cancelada"){
+          setOrderCanceling(true);
+        }else
+          setOrderCanceling(false);
         // Get all the units that referenced the order code
         order["units"] = await get(`/unit/${code}`)
         setData(order); // Set the data to show everything in the frontend
@@ -150,7 +154,7 @@ export const OrderDetails = () => {
       <label>Nombre:</label>
       <div className="data" id="name">
         <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
+        {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
       </div>
@@ -159,7 +163,7 @@ export const OrderDetails = () => {
       <label>Número:</label>
       <div className="data" id="phone">
         <input value={data.phone} onChange={handleChange} disabled={true} id="phoneInput"/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
+        {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
       </div>
@@ -168,7 +172,7 @@ export const OrderDetails = () => {
       <label>Dirección:</label>
       <div className="data" id="direction">
         <input value={data.direction} onChange={handleChange} disabled={true} id="directionInput"/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
+        {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
       </div>
@@ -182,7 +186,8 @@ export const OrderDetails = () => {
                                             size={unit.size} 
                                             neckType={unit.neckType} 
                                             detail={unit.description}
-                                            disabled={true}/>))}
+                                            disabled={true}
+                                            canceling={orderCanceling }/>))}
 
     <div className="question data" id="total">
       <label>Total a pagar:</label>
@@ -208,11 +213,11 @@ export const OrderDetails = () => {
     <>
       {inputImgSecondPayment ? (
       <>
-        <div className="question data">
+        <div className="question data payment">
           <label>Monto pendiente:</label>
           <p> ₡{data.total-data.firstPayment} </p> 
         </div>
-        <div className="question">
+        <div className="question payment">
           <label>Comprobante de segundo pago:</label><br/>
           <UploadFile isSecondPayment={true} id={data.id} phone={data.phone} idImgSecondPayment = {data.idImgSecondPayment}/>
         </div>

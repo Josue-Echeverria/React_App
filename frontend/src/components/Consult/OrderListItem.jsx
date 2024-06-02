@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import "./OrderListItem.css"
-import { del, get } from "../../endpoints";
+import { post, put, get } from "../../endpoints";
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
@@ -12,23 +12,37 @@ export const OrderListItem = (props) => {
     function getOrder(){
         window.location.replace(`http://localhost:3000/consult/${props.phone}/${props.code}`)
     }
-
-    function deleteOrder(){
-        window.location.replace(`http://localhost:3000/consult/${props.phone}/${props.code}`)
-    }
     
+    /**
+     * @description ClickHandler when the user confirms that they want to cancel the order
+     * 
+     * @returns Undefined : In case the client didnt select an option
+     */
     function sendCancelation(){
         var options = document.getElementsByName('option');
-        let selected
+        let reason;
+        // We iterate through the options
         for (var i = 0, length = options.length; i < length; i++) {
             if (options[i].checked) {
-            selected = options[i].value
-            break;
+                // To get the selected option
+                reason = document.querySelector(`label[for="${options[i].value}"]`).textContent;
+                break;
             }
         }
-        del(`/order/${props.code}/${selected}`)
-        window.location.replace(`http://localhost:3000/consult/${props.phone}`)
+        if(reason === undefined){
+            alert("Por favor seleccione una razon")
+            return
+        }
+        // Change the state 
+        const state = "Cancelando"
+        put(`/update/${props.code}/state`, {state})
+
+        // Send the cancelation petition
+        let date = new Date();
+        post(`/order/${props.code}/cancel`, {reason, date})
+        window.location.reload()
     }
+
     useEffect(() => {
         const fetchData = async () => {
             let payments = await get(`/payment/${props.code}`)
@@ -47,14 +61,23 @@ export const OrderListItem = (props) => {
             await setPayment(payments);
         }
         fetchData();
+        if(props.state === "Cancelando"){
+            document.querySelector(`#state${props.code}`).style.backgroundColor = "#FF7070"
+            document.querySelector(`#delBtn${props.code}`).disabled = true
+        }else if(props.state === "Cancelada"){
+            document.querySelector(`#state${props.code}`).style.background = "#0f172a"
+            document.querySelector(`#state${props.code}`).style.color = "#ffffff"
+            document.querySelector(`#delBtn${props.code}`).disabled = true
+        }
+
     }, []); 
 
     return (
 <div id= "orderListItem">
-    <label>{props.state}</label>
+    <label id={`state${props.code}`}>{props.state}</label>
     <div id="order">
         <div id="orderImgList">
-            <p className="info" id="date">{props.date}</p> 
+            <p id="date">{props.date}</p> 
             <img src={props.image} alt="Design"></img>
             {secondPaymentRecieved ? (
                 <p>Pagado</p>
@@ -69,23 +92,23 @@ export const OrderListItem = (props) => {
         </div>
         <div id="buttons">
             <button onClick={getOrder} id="getBtn"><i class="fa-solid fa-eye"></i></button>
-            <Popup trigger={<button onClick={deleteOrder} id="delBtn"><i class="fa-solid fa-trash-can"></i></button>} modal nested>
+            <Popup trigger={<button className="delBtn" id={`delBtn${props.code}`}><i class="fa-solid fa-trash-can"></i></button>} modal nested>
             {close => (
             <div className="modal">
                 <button className="close" onClick={close}>&times;</button>
                 <div className="content">
-                    <p>Porfavor indicanos la razon por la cual desea eliminar su orden: </p>
+                    <p>Por favor indicanos la razon por la cual desea eliminar su orden: </p>
                     <div className="option">
                         <input type="radio" name="option" value="1"/>
-                        <label> Mucho tiempo de espera</label>
+                        <label for="1">Mucho tiempo de espera</label>
                     </div>
                     <div className="option">
                         <input type="radio"  name="option" value="2"/>
-                        <label> Encontre una mejor oferta</label>
+                        <label for="2">Encontré una mejor oferta</label>
                     </div>
                     <div className="option">
                         <input type="radio" name="option" value="3"/>
-                        <label> Ya no quiero comprar </label>
+                        <label for="3">Ya no quiero comprar</label>
                     </div>
                 </div>
                 <button className="send" onClick= {sendCancelation}>Enviar</button>

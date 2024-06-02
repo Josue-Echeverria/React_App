@@ -1,0 +1,48 @@
+.question label {
+    padding-bottom: 1vh;
+}
+
+.question {
+    padding-top: 1vh;
+}
+
+#clientDiv{
+    display: flex;
+    flex-direction: column;
+}
+
+
+#clientDiv .fa-check{
+    display: none;
+}
+
+#clientDiv .fa-pen{
+    padding-left: 2vw;
+}
+
+.cancelBtn{
+    margin: 1vw;
+    background-color:rgb(255, 112, 112)
+}
+
+.confirmBtn{
+    margin: 1vw;
+    background-color:#B8F67B
+}
+
+.confirmationBtns{
+    display: flex;
+    flex-direction: row;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.confirmationBtns button{
+    flex: 1;
+    margin: 2vw;
+}
+
+.modal{
+    display: flex;
+    flex-direction: column;
+}

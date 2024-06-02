@@ -12,6 +12,8 @@ let ORIGINAL = {}
 function deleteClient(){
 
 }
+
+
 function loadPredefinedData(props){
     ORIGINAL[props.unitNumber] = {}
 
@@ -115,42 +117,30 @@ export const Client = (props) => {
       <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
     </div>
   </div>
-    <div className="question">
-      <label>Dirección:</label>
-      <div className="data" id="direction">
-        <input  id={`directionInput${props.unitNumber}`} disabled/> 
-        <i class="fa-solid fa-pen" onClick={update}></i>
-        <i class="fa-solid fa-check" onClick={saveUpdate}></i>
-        <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
-      </div>
+  <div className="question">
+    <label>Dirección:</label>
+    <div className="data" id="direction">
+      <input  id={`directionInput${props.unitNumber}`} disabled/> 
+      <i class="fa-solid fa-pen" onClick={update}></i>
+      <i class="fa-solid fa-check" onClick={saveUpdate}></i>
+      <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
     </div>
+  </div>
         
-  <div id="buttons">
-    <Popup trigger={<button id="delBtn"><i class="fa-solid fa-trash-can"></i></button>} modal nested>
-
+    <Popup trigger={<button className="delBtn"><i class="fa-solid fa-trash-can"></i></button>} position={"top center"}>
     {close => (
     <div className="modal">
-        <button className="close" onClick={close}>&times;</button>
-        <div className="content">
-            <p>Porfavor indicanos la razon por la cual desea eliminar su orden: </p>
-            <div className="option">
-                <input type="radio" name="option" value="1"/>
-                <label> Mucho tiempo de espera</label>
-            </div>
-            <div className="option">
-                <input type="radio"  name="option" value="2"/>
-                <label> Encontre una mejor oferta</label>
-            </div>
-            <div className="option">
-                <input type="radio" name="option" value="3"/>
-                <label> Ya no quiero comprar </label>
-            </div>
-            
-        </div>
-        <button className="send" onClick= {deleteClient}>Enviar</button>
+      <button className="close" onClick={close}>&times;</button>
+      <div className="content">
+          <label>Realmente desea eliminar al cliente con el numero {props.phone}</label>
+          
+      </div>
+      <div className='confirmationBtns'>
+        <button className="confirmBtn" onClick={deleteClient}>Aceptar</button>
+        <button className="cancelBtn" onClick={close}>Cancelar</button>
+      </div>
     </div>
     )}</Popup>
-  </div>
 </div>
   )
 };

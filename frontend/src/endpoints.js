@@ -39,3 +39,20 @@ export async function del(dir){
     return response
   }
 }
+
+
+export async function put(dir, body){
+  const request = new Request(`http://localhost:3001${dir}`, {
+    method: "PUT",
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }else{
+    return response
+  }
+}

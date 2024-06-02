@@ -151,7 +151,7 @@ export const Unit = (props) => {
         const parentNode = e.target.parentNode
         const childNodes = parentNode.childNodes
         // console.log(childNodes)
-        if(childNodes[0].id == `unit${props.unitNumber}Detail`){
+        if(childNodes[0].id === `unit${props.unitNumber}Detail`){
             childNodes[0].disabled = false
         }else{
             const parentDivButtons = e.target.parentNode.parentNode
@@ -162,6 +162,8 @@ export const Unit = (props) => {
         childNodes[2].style.display = "flex"
         childNodes[3].style.display = "flex"
     }
+
+
     let sizeBtn = document.querySelector(`#size${props.size}Unit${props.unitNumber}Btn`)
     if(props.size !== undefined && sizeBtn !== null){
         loadPredefinedData(props)
@@ -172,7 +174,7 @@ export const Unit = (props) => {
     <div className="buttonsDiv">
         <div className="buttonsDivIcons">
             <label>Talla: </label>
-            <i class="fa-solid fa-pen" onClick={update} ></i>
+            {props.canceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
             <i class="fa-solid fa-check" onClick={saveUpdate}></i>
             <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
         </div>
@@ -192,7 +194,7 @@ export const Unit = (props) => {
     <div className="buttonsDiv"><br/>
         <div className="buttonsDivIcons">
             <label>Tipo de cuello: </label>
-            <i class="fa-solid fa-pen" onClick={update}></i>
+            {props.canceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
             <i class="fa-solid fa-check" onClick={saveUpdate}></i>
             <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
         </div>
@@ -206,7 +208,7 @@ export const Unit = (props) => {
         <label>Detalle:</label>
         <div className="data">
             <input type="text" id={`unit${props.unitNumber}Detail`}/>
-            <i class="fa-solid fa-pen" onClick={update}></i>
+            {props.canceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
             <i class="fa-solid fa-check" onClick={saveUpdate}></i>
             <i class="fa-solid fa-xmark" onClick={cancelDescriptionUpdate}></i>
         </div>
