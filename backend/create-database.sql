@@ -190,9 +190,17 @@ BEGIN
 	
     IF @idClient IS NULL
     BEGIN
-        INSERT INTO dbo.[client] (name, phone, direction)
-        VALUES (@inName, @inPhone, @inDirection);
+        INSERT INTO dbo.[client] (name, phone, direction, active)
+        VALUES (@inName, @inPhone, @inDirection, 1);
         SET @idClient = @@IDENTITY;
+    END;
+    ELSE
+    BEGIN
+        IF EXISTS (SELECT 1 FROM dbo.client WHERE id = @idClient AND active = 0)
+        BEGIN 
+            SET @outResultCode = 1;
+            RETURN;
+        END;
     END;
 
     INSERT INTO dbo.image (image, idClient, date)
@@ -509,13 +517,15 @@ SET NOCOUNT ON;
     INNER JOIN dbo.[client] c ON a.idClient = c.id
     INNER JOIN dbo.[state] s ON a.idState = s.id
     WHERE a.idState != @idDelivered
-    AND a.idState != @idCanceled;
+    AND a.idState != @idCanceled
+    AND c.active = 1;
 
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
 
 GO
+
 
 CREATE PROCEDURE [dbo].[read_payment]
     @inId INT
@@ -542,6 +552,7 @@ SET NOCOUNT ON;
 
     SELECT name, phone, direction
     FROM dbo.client
+    WHERE active = 1;
 
     SET @outResultCode=0;
 SET NOCOUNT OFF;
@@ -711,6 +722,68 @@ SET NOCOUNT OFF;
 END;
 
 GO
+
+CREATE PROCEDURE [dbo].[set_client_deleted]
+	@outResultCode INT OUTPUT
+    , @inPhone VARCHAR(16)
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    DECLARE @idClient INT;
+    DECLARE @idOrder TABLE(id INT);
+
+    SELECT @idClient = id
+    FROM dbo.client
+    WHERE phone = @inPhone; 
+
+    INSERT INTO @idOrder 
+    SELECT id 
+    from dbo.[order]
+    WHERE idClient = @idClient;
+
+    UPDATE dbo.client
+    SET active = 0
+    WHERE @idClient = id;   
+
+    DELETE u
+    FROM dbo.[unit] u
+    INNER JOIN @idOrder o ON o.id = u.idOrder;
+
+    DELETE a
+    FROM dbo.[order] a
+    INNER JOIN @idOrder o ON o.id = a.id;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_payments_by_date_range]
+	@outResultCode INT OUTPUT
+    , @inStart DATE
+    , @inEnd DATE
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idClient INT;
+
+    SELECT 
+      [date]
+      ,[idOrder]
+      ,[idClient]
+      ,[idImage]
+      ,[amount]
+      ,[isFirstPayment]
+    FROM dbo.payment
+    WHERE [date] >= @inStart
+    AND [date] <= @inEnd;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- Data

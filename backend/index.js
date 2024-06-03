@@ -537,3 +537,52 @@ app.put("/order/cancel/:id/accept", async (req, res) => {
     sql.close();
   }
 });
+
+
+/** SET CLIENT DELETED 
+ * 
+ * @description Sets the active column of the client in 0
+ * 
+ * @satisfies Delete client
+ */
+app.delete("/client/:phone", async (req, res) => {
+  try{
+    const phone = req.params.phone
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    request.input('inPhone', sql.VarChar(16), phone);
+    const result = await request.execute('set_client_deleted');
+
+    res.json(result.recordset);
+  } 
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+/** GET PAYMENT DATA
+ * 
+ */
+app.post("/payments", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const {start, end} = req.body
+    request.output('outResultCode', sql.Int);
+    request.input('inStart', sql.Date, start);
+    request.input('inEnd', sql.Date, end);
+    const result = await request.execute('read_payments_by_date_range');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});

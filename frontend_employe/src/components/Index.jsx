@@ -3,5 +3,7 @@ export * from "./Main.jsx";
 export * from "./OrderList/OrderDetails.jsx"
 export * from "./OrderList/OrderList.jsx"
 export * from "./ClientList/ClientList.jsx"
-export * from "./Stadistics/Stadistics.jsx"
+export * from "./Report/Report.jsx"
+export * from "./Report/Chart.jsx"
+export * from "./Report/Datepicker.jsx"
 

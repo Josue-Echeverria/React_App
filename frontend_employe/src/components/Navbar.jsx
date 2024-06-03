@@ -1,4 +1,4 @@
-import { OrderList, ClientList, Stadistics } from "./Index";
+import { OrderList, ClientList, Report } from "./Index";
 import "./Navbar.css";
 import React, { useState } from 'react';
 import 'reactjs-popup/dist/index.css';
@@ -17,24 +17,24 @@ document.addEventListener("click", function(event) {
 function Navbar(){
   const [showOrders, setShowOrders] = useState(false);
   const [showClients, setShowClients] = useState(false);
-  const [showStadistics, setShowStadistics] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   function getOrders(){
     setShowOrders(true);
     setShowClients(false)
-    setShowStadistics(false)
+    setShowReport(false)
   }
   
   function getClients(){
     setShowOrders(false);
     setShowClients(true)
-    setShowStadistics(false)
+    setShowReport(false)
   }
 
-  function getStadistics(){
+  function getReport(){
     setShowOrders(false);
     setShowClients(false)
-    setShowStadistics(true)
+    setShowReport(true)
   }
 
   return (
@@ -42,11 +42,11 @@ function Navbar(){
     <nav>
         <i class="fa-solid fa-list" onClick={getOrders}></i>
         <i class="fa-solid fa-users" onClick={getClients}></i>
-        <i class="fa-solid fa-clock-rotate-left" onClick={getStadistics}></i>
+        <i class="fa-solid fa-clock-rotate-left" onClick={getReport}></i>
     </nav>
     {showOrders && <OrderList />}
     {showClients && <ClientList />}
-    {showStadistics && <Stadistics />}
+    {showReport && <Report />}
   </div>
   );
 };

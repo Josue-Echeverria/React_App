@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Popup from 'reactjs-popup';
 import "./Client.css"
-import { post } from '../../endpoints';
+import { post, del } from '../../endpoints';
 
 /*
 * ORIGINAL is an object that stores the original values of the inputs.
 * @type {Object}
 */
 let ORIGINAL = {}
-
-function deleteClient(){
-
-}
-
 
 function loadPredefinedData(props){
     ORIGINAL[props.unitNumber] = {}
@@ -28,13 +23,11 @@ function loadPredefinedData(props){
     ORIGINAL[props.unitNumber]["direction"] = props.direction 
     let direction = document.querySelector(`#directionInput${props.unitNumber}`)
     direction.value = props.direction
-    
 }
 
 
 export const Client = (props) => {
   useEffect(()=>{
-    
     loadPredefinedData(props)
   })
   
@@ -96,6 +89,12 @@ export const Client = (props) => {
     childNodes[2].style.display = "none"
     childNodes[3].style.display = "none"
   }
+
+  
+function deleteClient(){
+  del(`/client/${ORIGINAL[props.unitNumber]["phone"]}`)
+  window.location.reload()
+}
 
   return (
 <div id= "clientDiv">    
