@@ -760,7 +760,7 @@ END;
 
 GO
 
-CREATE PROCEDURE [dbo].[read_payments_by_date_range]
+CREATE PROCEDURE [dbo].[read_payment_sum]
 	@outResultCode INT OUTPUT
     , @inStart DATE
     , @inEnd DATE
@@ -770,20 +770,67 @@ SET NOCOUNT ON;
     DECLARE @idClient INT;
 
     SELECT 
-      [date]
-      ,[idOrder]
-      ,[idClient]
-      ,[idImage]
-      ,[amount]
-      ,[isFirstPayment]
+      [date] 
+      ,SUM([amount]) AS Ganancias
     FROM dbo.payment
     WHERE [date] >= @inStart
-    AND [date] <= @inEnd;
+    AND [date] <= @inEnd
+    GROUP BY [date];
 
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
 
+GO
+
+CREATE PROCEDURE [dbo].[read_order_count]
+	@outResultCode INT OUTPUT
+    , @inStart DATE
+    , @inEnd DATE
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idCanceled INT;
+
+    SELECT @idCanceled = id 
+    FROM dbo.[state] 
+    WHERE name = 'Cancelada';
+
+    SELECT 
+      [date] 
+      ,COUNT(*) AS Cantidad
+    FROM dbo.[order]
+    WHERE [date] >= @inStart
+    AND [date] <= @inEnd
+    AND idState !=  @idCanceled
+    GROUP BY [date];
+    
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_payments]
+	@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    SELECT 
+        p.id
+        , p.date
+        , p.idOrder
+        , p.idImage
+        , p.amount
+        , p.isFirstPayment
+        , c.phone
+    FROM dbo.payment p
+    INNER JOIN dbo.client c on c.id = p.idClient;
+    
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- Data
@@ -798,7 +845,8 @@ INSERT INTO [dbo].[size] ([name])
 VALUES ('XL'),('L'),('M'),('S'),('16'),('14'),('12'),('10'),('8');
 
 INSERT INTO [dbo].[state] ([name])
-VALUES ('En fabricación'),('Entregado'),('Listo'),('Cancelando'),('Cancelada'),('Procesando'),('Aceptada'),('Rechazada');
+VALUES ('En fabricación'),('Entregado'),('Listo'),('Cancelando'),('Cancelada')
+,('Procesando'),('Aceptada'),('Rechazada');
 
 INSERT INTO [dbo].[reason] ([name])
 VALUES ('Contenido inapropiado'),('Información confusa'),('Falta de información'),('Mucho tiempo de espera'),('Encontré una mejor oferta'),('Ya no quiero comprar');

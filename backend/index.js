@@ -576,7 +576,50 @@ app.post("/payments", async (req, res) => {
     request.output('outResultCode', sql.Int);
     request.input('inStart', sql.Date, start);
     request.input('inEnd', sql.Date, end);
-    const result = await request.execute('read_payments_by_date_range');
+    const result = await request.execute('read_payment_sum');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+/** GET PAYMENT DATA
+ * 
+ */
+app.post("/orders/count", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const {start, end} = req.body
+    request.output('outResultCode', sql.Int);
+    request.input('inStart', sql.Date, start);
+    request.input('inEnd', sql.Date, end);
+    const result = await request.execute('read_order_count');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+/**
+ * 
+ */
+app.get("/payments", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('read_payments');
     res.json(result.recordset);
   }
   catch (error) {

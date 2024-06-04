@@ -131,7 +131,7 @@ function deleteClient(){
     <div className="modal">
       <button className="close" onClick={close}>&times;</button>
       <div className="content">
-          <label>Realmente desea eliminar al cliente con el numero {props.phone}</label>
+        <label>Realmente desea eliminar al cliente con el numero {props.phone}</label>
           
       </div>
       <div className='confirmationBtns'>

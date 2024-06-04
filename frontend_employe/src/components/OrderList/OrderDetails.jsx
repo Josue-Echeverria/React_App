@@ -67,6 +67,7 @@ export const OrderDetails = () => {
     setData({...data, name: event.target.value}); // update state when input changes
   };
 
+
   function sendFirstPayment(){
     let amount = document.querySelector("#inputFirstPayment").value
     if(amount.length <= 1){
@@ -82,6 +83,7 @@ export const OrderDetails = () => {
     window.location.reload();
   }
 
+  
   function sendSecondPayment(){
     let amount = document.querySelector("#inputSecondPayment").value
     if(amount.length <= 1){
@@ -96,7 +98,6 @@ export const OrderDetails = () => {
     post("/payment", {date, amount, code, name, idImgPayment, isFirstPayment})
     window.location.reload();
   }
-
 
 
   /**
@@ -265,7 +266,8 @@ export const OrderDetails = () => {
           <div className="modalExclamation">
               <button className="close" onClick={close}>&times;</button>
               <div className="content">
-                  <p>Desea indicar al usuario que el espacio no esta claro</p>
+                  <p>Confirmar que el cliente realizo el pago de:</p>
+                  <p>{document.querySelector("#inputFirstPayment").value}</p>
               </div>
               <button onClick= {sendFirstPayment}>Confirmar</button>
           </div>
@@ -288,8 +290,7 @@ export const OrderDetails = () => {
       </div>
     </>
     ):(<>
-      {imgSecondPayment ? (
-      <>
+      {imgSecondPayment ? (<>
         <div className="question" >
           <label>Comprobante de segundo pago:</label><br/>
           <div className="imgDiv" id="imgSecondPaymentDiv">
@@ -304,7 +305,8 @@ export const OrderDetails = () => {
             <div className="modalExclamation">
                 <button className="close" onClick={close}>&times;</button>
                 <div className="content">
-                    <p>Desea guardar el pago del cliente</p>
+                  <p>Confirmar que el cliente realizo el pago de:</p>
+                  <p>{document.querySelector("#inputSecondPayment").value}</p>
                 </div>
                 <button onClick= {sendSecondPayment}>Confirmar</button>
             </div>
@@ -312,13 +314,12 @@ export const OrderDetails = () => {
           </Popup>
         </div>
       </>) : (
-        firstPaymentRecieved ? (
-        <>      
+        firstPaymentRecieved && (<>  
           <div className="question payment">
             <label>Monto pendiente:</label>
             <p>₡{data.total-data.firstPaymentRecieved} </p> 
           </div>
-        </>) : (<></>)
+        </>)
       )}
     </>)}
     </div>

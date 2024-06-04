@@ -1,5 +1,44 @@
+.reports{
+    height: 80vh;
+}
+
 .report{
+    display: flex;
+    flex-direction: column;
     padding: 2vw;
-    border-bottom: solid rgba(0, 0, 0, 0.326) 2px;
     align-items: center;
+    background-color: rgba(128, 128, 128, 0.245);
+    border-radius: 10px;
+    margin-bottom: 3vh;
+}
+
+.report h2{
+    text-decoration: underline;
+}
+
+
+.dates{
+    margin-top: 2vh;
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 2vh;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.date{
+    margin-left: 3vw;
+    margin-right: 3vw;
+    padding: 3vw;
+    display: grid;
+}
+
+.date input{
+    width: 25vw;
+}
+
+.recharts-surface{
+    background-color: white;
+    border-radius: 10px;
+    padding-top: 2vh;
 }

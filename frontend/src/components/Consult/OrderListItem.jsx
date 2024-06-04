@@ -9,6 +9,9 @@ export const OrderListItem = (props) => {
     const [secondPaymentRecieved, setsecondPaymentRecieved] = useState(null); 
     const [payment, setPayment] = useState(null); 
 
+    /**
+     * 
+     */
     function getOrder(){
         window.location.replace(`http://localhost:3000/consult/${props.phone}/${props.code}`)
     }
@@ -50,8 +53,7 @@ export const OrderListItem = (props) => {
             if(payments.length === 0){
                 setfirstPaymentRecieved(false)
                 setsecondPaymentRecieved(false)
-            }
-            else if(payments.length === 1){
+            } else if(payments.length === 1){
                 setfirstPaymentRecieved(true)
                 setsecondPaymentRecieved(false)
             } else if (payments.length === 2){
