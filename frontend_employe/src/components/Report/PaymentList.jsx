@@ -4,6 +4,7 @@ import { get } from "../../endpoints"
 import "./PaymentList.css"
 import Popup from "reactjs-popup"
 import DatePicker from "react-datepicker"
+import { Label } from "recharts"
 
 export const PaymentList = () => {
     const today = new Date(); 
@@ -15,11 +16,16 @@ export const PaymentList = () => {
     const [DateEnd, setDateEnd] = useState(today);
 
     useEffect(() =>{
-        async function fetchData(){
-            setPayments(await get("/payments"))
+        const fetchData = async () =>{
+            try {
+                const payments = await get("/payments")
+                setPayments(payments)
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         }
         fetchData()
-    })
+    }, []); 
 
     return (<>
 <nav>
@@ -55,6 +61,12 @@ export const PaymentList = () => {
         </div>
     </div>
     )}</Popup>
+    <div className="columnName">
+        <label></label>
+        <label>Código</label>
+        <label>Teléfono</label>
+        <label>Monto</label>
+    </div>
     <ul>
         {Payments && ( Payments.map((payment, index) => (
             <PaymentItem key={index} info={payment}/>

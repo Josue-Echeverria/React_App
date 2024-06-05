@@ -147,34 +147,6 @@ nav a {
     width: 50%;
 }
 
-.modalExclamation {
-    width: 100%;
-    font-family: "Inter", sans-serif;
-    font-size: 4vw;
-}
-
-.modalExclamation p{
-    font-family: "Inter", sans-serif;
-    font-size: 4vw;
-}
-
-.modalExclamation > .content {
-    width: 100%;
-    padding-left: 3vw;
-}
-
-.modalExclamation > .close {
-    position: absolute;
-    display: block;
-    padding: 2px 5px;
-    line-height: 20px;
-    right: -10px;
-    top: -10px;
-    font-size: 24px;
-    background: #ffffff;
-    border-radius: 18px;
-    border: 1px solid #cfcece;
-}
 
 .fa-check{
     margin-left: 2vw;

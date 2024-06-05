@@ -171,7 +171,7 @@ export const OrderDetails = () => {
     <div className="question">
       <label>Dirección:</label>
       <div className="data" id="direction">
-        <input value={data.direction} onChange={handleChange} disabled={true} id="directionInput"/> 
+        <input value={data.direction} onChange={handleChange} disabled id="directionInput"/> 
         {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>

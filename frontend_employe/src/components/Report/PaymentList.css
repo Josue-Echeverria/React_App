@@ -1,4 +1,24 @@
 .paymentList button{
     width: 95%;
     font-size:x-large;
+    background-color:#B8F67B
+}
+
+.paymentList ul{
+    display: flex;
+    flex-direction: column;
+}
+
+.columnName{
+    display: grid;
+    grid-template-columns: 25% 20% 30% 25%;
+    text-align: center;
+    margin-top: 3vh;
+    border-top: solid black 1px;
+    padding-top: 3vh;
+}
+
+.columnName label{
+    border-left: solid black 1px;
+    font-weight: bold;
 }

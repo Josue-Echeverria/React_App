@@ -1,0 +1,58 @@
+.paymentItem{
+    display: grid;
+    grid-template-columns: 25% 20% 30% 25%;
+    text-align: center;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
+    background-color: rgb(221, 221, 221);
+    border-radius: 10px;
+    align-items: center;
+    box-shadow: 2px 5px 5px gray;
+}
+
+.paymentItem label{
+    border-left: solid black 1px;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+
+.paymentItem button{
+    font-size: medium;
+    width: 20vw;
+    height: 7vh;
+    background-color:rgb(255, 112, 112)
+}
+
+.paymentItem .fa-pen{
+    margin-left: 1vw;
+}
+
+.paymentItem .fa-check{
+    display: none;
+}
+
+.paymentItem .fa-pen{
+    margin-left: 1vw;
+}
+
+.popup-content{
+    width: 50%;
+    padding: 3vw;
+    text-align: center;
+}
+
+
+#amountInput{
+    width: 15vw;
+    padding: 1vw;
+}
+
+#checkxmarkDiv{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#checkxmarkDiv i{
+    padding: 2vw;
+}

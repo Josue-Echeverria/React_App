@@ -629,3 +629,22 @@ app.get("/payments", async (req, res) => {
     sql.close();
   }
 });
+
+
+app.delete("/payment/:id", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const id = req.params.id
+    const request = new sql.Request();
+    request.input('inId', sql.Int, id)
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('delete_payment');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});

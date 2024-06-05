@@ -153,18 +153,19 @@ export const OrderDetails = () => {
         if(payments.length === 0){
           setfirstPaymentRecieved(false)
           setSecondPaymentRecieved(false)
-        }else{
-          setfirstPaymentRecieved(true)
+        }else if (payments.length === 1){
           if(payments[0]["isFirstPayment"]){
+            setfirstPaymentRecieved(true)
+            setSecondPaymentRecieved(false)
             order["firstPaymentRecieved"] = payments[0]["amount"]
-            if(payments[1] !== undefined){
-              order["secondPaymentRecieved"] = payments[1]["amount"]
-              setSecondPaymentRecieved(true)
-            }
+            // if(payments[1] !== undefined){
+            //   order["secondPaymentRecieved"] = payments[1]["amount"]
+            //   setSecondPaymentRecieved(true)
+            // }
           }else{
-            order["firstPaymentRecieved"] = payments[1]["amount"]
             order["secondPaymentRecieved"] = payments[0]["amount"]
             setSecondPaymentRecieved(true)
+            setfirstPaymentRecieved(false)
           }
         }
 
@@ -256,28 +257,25 @@ export const OrderDetails = () => {
     </div>
     <div className="question payment" >
       <label>Monto recibido: </label>
-      {firstPaymentRecieved ? 
-      (<p>₡{data.firstPaymentRecieved}</p>
-      ):(
-      <>
+      {firstPaymentRecieved ? (
+        <p>₡{data.firstPaymentRecieved}</p>
+      ):(<>
         <input className="inputMoney" id="inputFirstPayment"></input> 
         <Popup trigger={<i class="fa-solid fa-check"></i>} position={'top right'}>
           {close => (
-          <div className="modalExclamation">
-              <button className="close" onClick={close}>&times;</button>
-              <div className="content">
-                  <p>Confirmar que el cliente realizo el pago de:</p>
-                  <p>{document.querySelector("#inputFirstPayment").value}</p>
-              </div>
-              <button onClick= {sendFirstPayment}>Confirmar</button>
+          <div className="modal">
+            <button className="close" onClick={close}>&times;</button>
+            <div className="content">
+              <p>¿Desea enviar que el cliente realizó el primer pago exitosamente?</p>
+            </div>
+            <button onClick= {sendFirstPayment}>Confirmar</button>
           </div>
           )}
         </Popup>
       </>)}
     </div>
     <div className="question" id="SecondPaymentDiv">
-    {secondPaymentRecieved ? (
-    <>
+    {secondPaymentRecieved ? (<>
       <div className="question" >
         <label>Comprobante de segundo pago:</label><br/>
         <div className="imgDiv" id="imgSecondPaymentDiv">
@@ -288,43 +286,39 @@ export const OrderDetails = () => {
         <label>Monto recibido: </label>
         <p>₡{data.secondPaymentRecieved}</p>
       </div>
-    </>
-    ):(<>
-      {imgSecondPayment ? (<>
-        <div className="question" >
-          <label>Comprobante de segundo pago:</label><br/>
-          <div className="imgDiv" id="imgSecondPaymentDiv">
-            <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
-          </div>
+    </>):(<>
+    {imgSecondPayment ? (<>
+      <div className="question" >
+        <label>Comprobante de segundo pago:</label><br/>
+        <div className="imgDiv" id="imgSecondPaymentDiv">
+          <img src={data.imgSecondPayment} alt="Second Payment" id="imgSecondPayment"></img>
         </div>
-        <div className="question payment" >
-          <label>Monto recibido: </label>
-          <input className="inputMoney" id="inputSecondPayment"></input> 
-          <Popup trigger={<i class="fa-solid fa-check"></i>} position={'top right'}>
-            {close => (
-            <div className="modalExclamation">
-                <button className="close" onClick={close}>&times;</button>
-                <div className="content">
-                  <p>Confirmar que el cliente realizo el pago de:</p>
-                  <p>{document.querySelector("#inputSecondPayment").value}</p>
-                </div>
-                <button onClick= {sendSecondPayment}>Confirmar</button>
+      </div>
+      <div className="question payment" >
+        <label>Monto recibido: </label>
+        <input className="inputMoney" id="inputSecondPayment"></input> 
+        <Popup trigger={<i class="fa-solid fa-check"></i>} position={'top right'}>
+          {close => (
+          <div className="modal">
+            <button className="close" onClick={close}>&times;</button>
+            <div className="content">
+              <p>¿Desea enviar que el cliente realizó el segundo pago exitosamente?</p>
             </div>
-            )}
-          </Popup>
-        </div>
-      </>) : (
-        firstPaymentRecieved && (<>  
-          <div className="question payment">
-            <label>Monto pendiente:</label>
-            <p>₡{data.total-data.firstPaymentRecieved} </p> 
+            <button onClick= {sendSecondPayment}>Confirmar</button>
           </div>
-        </>)
-      )}
+          )}
+        </Popup>
+      </div>
+    </>) : (
+      firstPaymentRecieved && (<>  
+        <div className="question payment">
+          <label>Monto pendiente:</label>
+          <p>₡{data.total-data.firstPaymentRecieved} </p> 
+        </div>
+      </>)
+    )}
     </>)}
-    </div>
-  </div>)}
-</div>
-  
-};
+  </div>
+</div>)}
+</div>};
 

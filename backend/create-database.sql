@@ -832,6 +832,24 @@ SET NOCOUNT ON;
 SET NOCOUNT OFF;
 END;
 
+GO 
+
+CREATE PROCEDURE [dbo].[delete_payment]
+	@outResultCode INT OUTPUT
+    ,@inId INT 
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    DELETE FROM dbo.payment 
+    WHERE id = @inId;
+    
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- Data
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
