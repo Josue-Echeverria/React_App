@@ -377,13 +377,14 @@ app.get("/orders", async (req, res) => {
 });
 
 
-app.put("/update/:id/state", async (req,res) => {
+app.put("/update/state/:id", async (req,res) => {
   try{
     await sql.connect(config);
     const id = req.params.id
-    const {state} = req.body
+    const {state, userId} = req.body
     const request = new sql.Request();
     request.input('inIdOrder', sql.Int, id);
+    request.input('inUserId', sql.Int, userId);
     request.input('inName', sql.VarChar(32), state);
     request.output('outResultCode', sql.Int);
     const result = await request.execute('change_state');
@@ -568,7 +569,7 @@ app.delete("/client/:phone", async (req, res) => {
 /** GET PAYMENT DATA
  * 
  */
-app.post("/payments", async (req, res) => {
+app.post("/payments/sum", async (req, res) => {
   try{
     await sql.connect(config);
     const request = new sql.Request();
@@ -577,6 +578,29 @@ app.post("/payments", async (req, res) => {
     request.input('inStart', sql.Date, start);
     request.input('inEnd', sql.Date, end);
     const result = await request.execute('read_payment_sum');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+/** GET PAYMENT DATA
+ * 
+ */
+app.post("/payments", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    const {start, end} = req.body
+    request.output('outResultCode', sql.Int);
+    request.input('inStart', sql.Date, start);
+    request.input('inEnd', sql.Date, end);
+    const result = await request.execute('read_payments_date_range');
     res.json(result.recordset);
   }
   catch (error) {
@@ -641,6 +665,68 @@ app.delete("/payment/:id", async (req, res) => {
     const result = await request.execute('delete_payment');
     res.json(result.recordset);
   }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.put("/payment/:id", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const id = req.params.id
+    const { amount } = req.body;
+    const request = new sql.Request();
+    request.input('inId', sql.Int, id)
+    request.input('inAmount', sql.Money, amount)
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('update_payment');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+app.get("/orders/delivered", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('read_orders_delivered');
+    res.json(result.recordset);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching data.');
+  } finally {
+    sql.close();
+  }
+});
+
+
+
+/** GET ORDERS NOT CANCELED
+ * 
+ * @description Gets all the orders from the db registered to the number 
+ * 
+ * @satisfies READ ORDER
+ */
+app.get("/orders/all", async (req, res) => {
+  try{
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.output('outResultCode', sql.Int);
+    const result = await request.execute('read_orders_not_canceled');
+    res.json(result.recordset);
+  } 
   catch (error) {
     console.error(error);
     res.status(500).send('Error fetching data.');

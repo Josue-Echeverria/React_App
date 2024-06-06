@@ -8,6 +8,11 @@ import { post } from '../../endpoints';
 function getPayments(){
   window.location.replace(`http://localhost:3002/payments`)
 }
+
+function getOrders(){
+  window.location.replace(`http://localhost:3002/orders/delivered`)
+}
+
 export const Report = () => {
   const today = new Date(); 
   const past = new Date();
@@ -31,7 +36,7 @@ export const Report = () => {
 
       start = DateStartChart1
       end = DateEndChart1
-      let payments = await (await post("/payments", {start, end})).json()
+      let payments = await (await post("/payments/sum", {start, end})).json()
       setProfits(payments)
     }
     fetchData()
@@ -61,7 +66,7 @@ export const Report = () => {
           />
       </div>
     </div>
-    <button>Ver ordenes</button>
+    <button onClick={getOrders}>Ver ordenes</button>
   </div>
   <div className='report'>
     <h2>Ganacias</h2>
@@ -86,9 +91,7 @@ export const Report = () => {
           />
       </div>
     </div>
-    <button 
-    onClick={getPayments} 
-    >Ver pagos</button>
+    <button onClick={getPayments}>Ver pagos</button>
   </div>
 </div>
 )}

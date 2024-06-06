@@ -12,6 +12,13 @@
     margin-bottom: 3vh;
 }
 
+.report button{
+    width: 95%;
+    font-size:x-large;
+    background-color:#B8F67B
+}
+
+
 .report h2{
     text-decoration: underline;
 }

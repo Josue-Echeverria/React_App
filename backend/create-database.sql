@@ -108,18 +108,19 @@ CREATE TABLE [dbo].[unit] (
 GO
 
 CREATE TABLE [dbo].[stateChangeOrder] (
-    [id]              INT IDENTITY(1,1) NOT NULL,
-    [idOrder]         INT           NOT NULL,
-    [idUser]          INT           NOT NULL,
-    [idOriginalState] INT           NOT NULL,
-    [idActualState]   INT           NOT NULL,
-    [date]            DATETIME2 (7) NOT NULL,
+    [id]         INT           IDENTITY (1, 1) NOT NULL,
+    [idOrder]    INT           NOT NULL,
+    [idUser]     INT           NOT NULL,
+    [idOldState] INT           NOT NULL,
+    [idNewState] INT           NOT NULL,
+    [date]        DATE NOT NULL,
     CONSTRAINT [PK_stateChangeOrder] PRIMARY KEY CLUSTERED ([id] ASC),
-    CONSTRAINT [FK_stateChangeOrder_actual_state] FOREIGN KEY ([idActualState]) REFERENCES [dbo].[state] ([id]),
+    CONSTRAINT [FK_stateChangeOrder_actual_state] FOREIGN KEY ([idNewState]) REFERENCES [dbo].[state] ([id]),
     CONSTRAINT [FK_stateChangeOrder_order] FOREIGN KEY ([idOrder]) REFERENCES [dbo].[order] ([id]),
-    CONSTRAINT [FK_stateChangeOrder_original_state] FOREIGN KEY ([idOriginalState]) REFERENCES [dbo].[state] ([id]),
+    CONSTRAINT [FK_stateChangeOrder_original_state] FOREIGN KEY ([idOldState]) REFERENCES [dbo].[state] ([id]),
     CONSTRAINT [FK_stateChangeOrder_user] FOREIGN KEY ([idUser]) REFERENCES [dbo].[user] ([id])
 );
+
 
 GO
 
@@ -597,30 +598,51 @@ SET NOCOUNT ON;
 SET NOCOUNT OFF;
 END;
 
-GO 
+GO
 
-CREATE PROCEDURE [dbo].[change_state]
+ALTER PROCEDURE [dbo].[change_state]
     @inName VarChar(32) 
     ,@inIdOrder Int 
+    ,@inUserId Int 
 	,@outResultCode INT OUTPUT
 AS
 BEGIN
 SET NOCOUNT ON;
-    DECLARE @idState INT;
+    DECLARE @idOldState INT;
+    DECLARE @idNewState INT;
 
-    SELECT @idState = id
+    SELECT @idNewState = id
     FROM dbo.State
-    WHERE @inName = name
+    WHERE @inName = name;
+
+    SELECT @idOldState = idState 
+    FROM dbo.[order]
+    WHERE @inIdOrder = id;
 
     UPDATE dbo.[order]
-    SET idState = @idState
-    WHERE @inIdOrder = id
+    SET idState = @idNewState
+    WHERE @inIdOrder = id;
+
+    INSERT INTO dbo.stateChangeOrder (
+        idOrder
+        , idNewState
+        , idOldState
+        , idUser
+        , [date]
+        ) 
+    VALUES (
+        @inIdOrder
+        ,@idNewState
+        ,@idOldState
+        ,@inUserId
+        ,CURRENT_TIMESTAMP);
 
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;
 
 GO
+
 
 CREATE PROCEDURE [dbo].[create_cancelation]
 	@outResultCode INT OUTPUT
@@ -844,6 +866,103 @@ SET NOCOUNT ON;
     DELETE FROM dbo.payment 
     WHERE id = @inId;
     
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[update_payment]
+	@outResultCode INT OUTPUT
+    ,@inId INT 
+    ,@inAmount MONEY 
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    UPDATE dbo.payment
+    SET amount = @inAmount
+    WHERE id = @inId;
+    
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_payments_date_range]
+	@outResultCode INT OUTPUT
+    , @inStart DATE
+    , @inEnd DATE
+AS
+BEGIN
+SET NOCOUNT ON;
+
+    SELECT 
+        p.id
+        , p.date
+        , p.idOrder
+        , p.idImage
+        , p.amount
+        , p.isFirstPayment
+        , c.phone
+    FROM dbo.payment p
+    INNER JOIN dbo.client c on c.id = p.idClient
+    WHERE [date] >= @inStart
+    AND [date] <= @inEnd;
+    
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_date_delivered]
+	@outResultCode INT OUTPUT
+    , @inId INT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idDelivered INT;
+
+    SELECT @idDelivered = id
+    FROM dbo.[state]
+    WHERE name = 'Entregado'
+
+    SELECT [date], idUser
+    FROM dbo.stateChangeOrder 
+    WHERE idOrder = @inId
+    AND idNewState = @idDelivered
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+CREATE PROCEDURE [dbo].[read_orders_not_canceled]
+	@outResultCode INT OUTPUT
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idCanceled INT;
+    
+    SELECT @idCanceled = id 
+    FROM dbo.[state] 
+    WHERE name = 'Cancelada';
+
+    SELECT a.id
+    , i.[image]
+    , c.phone
+    , a.date
+    , s.name AS state
+    FROM dbo.[order] a
+    INNER JOIN dbo.[image] i ON a.idImgDesign = i.id
+    INNER JOIN dbo.[client] c ON a.idClient = c.id
+    INNER JOIN dbo.[state] s ON a.idState = s.id
+    AND a.idState != @idCanceled
+    AND c.active = 1;
+
     SET @outResultCode=0;
 SET NOCOUNT OFF;
 END;

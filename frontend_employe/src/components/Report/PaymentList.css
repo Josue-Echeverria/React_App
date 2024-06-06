@@ -9,6 +9,10 @@
     flex-direction: column;
 }
 
+.popup-content{
+    width: 90%;
+}
+
 .columnName{
     display: grid;
     grid-template-columns: 25% 20% 30% 25%;

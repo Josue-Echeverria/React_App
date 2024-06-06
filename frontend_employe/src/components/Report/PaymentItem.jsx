@@ -1,15 +1,12 @@
 import React, { useState } from "react"
 import "./PaymentItem.css"
 import Popup from "reactjs-popup"
-import { del } from "../../endpoints"
+import { del, put } from "../../endpoints"
 
 let ORIGINAL = {}
 
 export const PaymentItem = (props) => {
     const [data, setData] = useState(props.info);
-    // setData(props.info.amount)
-    console.log(props.info)
-    console.log(data)
     const handleChange = (event) => {
         setData({...data.amount, amount: event.target.value}); // update state when input changes
     };
@@ -27,9 +24,9 @@ export const PaymentItem = (props) => {
         const parentNode = e.target.parentNode
         const childNodes = parentNode.childNodes
 
+        
         childNodes[0].disabled = false
         childNodes[1].style.display = "none"
-
         childNodes[2].childNodes[0].style.display = "grid"
         childNodes[2].childNodes[1].style.display = "grid"
     }
@@ -38,6 +35,7 @@ export const PaymentItem = (props) => {
         const parentNode = e.target.parentNode.parentNode
         const childNodes = parentNode.childNodes
 
+        childNodes[0].value = props.info.amount
         childNodes[0].disabled = true
         childNodes[1].style.display = "inline-block"
         childNodes[2].childNodes[0].style.display = "none"
@@ -47,7 +45,10 @@ export const PaymentItem = (props) => {
     function sendUpdate(e){
         const parentNode = e.target.parentNode.parentNode
         const childNodes = parentNode.childNodes
+        const amount = childNodes[0].value
 
+        put(`/payment/${props.info.id}`, {amount})
+        props.info.amount = amount
         childNodes[0].disabled = true
         childNodes[1].style.display = "inline-block"
         childNodes[2].childNodes[0].style.display = "none"
@@ -56,7 +57,7 @@ export const PaymentItem = (props) => {
 
     return (<>
 <div className="paymentItem">
-    <Popup trigger={<button on><i class="fa-solid fa-trash-can"></i></button>} position={"left"}>
+    <Popup trigger={<button on><i class="fa-solid fa-trash-can"></i></button>} position={"right"}>
     {close => (
     <div className="modal">
         <button className="close" onClick={close}>&times;</button>

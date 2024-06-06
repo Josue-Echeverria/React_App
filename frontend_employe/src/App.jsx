@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import { Login, Main, OrderDetails, PaymentList } from "./components/Index";
+import { Login, Main, OrderDetails, PaymentList, ReportPDF, DeliveredList } from "./components/Index";
 
 
 function App() {
@@ -14,6 +14,9 @@ function App() {
         <Route path="/main" element={<Main />} />
         <Route path="/order/:phone/:code" element={<OrderDetails />} />
         <Route path="/payments" element={<PaymentList />} />
+        <Route path="/payments/report" element={<ReportPDF />} />
+        <Route path="/orders/delivered" element={<DeliveredList />} />
+        
       </Routes>
     </div>
   );

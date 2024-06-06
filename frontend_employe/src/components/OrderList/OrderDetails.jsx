@@ -119,7 +119,8 @@ export const OrderDetails = () => {
           state = options[i].textContent
       }
     }
-    put(`/update/state/${code}`, {state})
+    const userId = 1 // This is jsut for  testing purposes
+    put(`/update/state/${code}`, {state, userId})
 
     childNodes[1].disabled = true
     childNodes[2].style.display = "flex"
