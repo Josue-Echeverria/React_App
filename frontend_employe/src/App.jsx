@@ -14,8 +14,9 @@ function App() {
         <Route path="/main" element={<Main />} />
         <Route path="/order/:phone/:code" element={<OrderDetails />} />
         <Route path="/payments" element={<PaymentList />} />
-        <Route path="/payments/report" element={<ReportPDF />} />
-        <Route path="/orders/delivered" element={<DeliveredList />} />
+        <Route path="/payments/report" element={<ReportPDF data="payments"/>} />
+        <Route path="/orders/report" element={<DeliveredList />} />
+        <Route path="/orders/report/download" element={<ReportPDF data="orders"/>} />
         
       </Routes>
     </div>

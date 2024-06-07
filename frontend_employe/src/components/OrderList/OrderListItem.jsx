@@ -52,10 +52,11 @@ export const OrderListItem = (props) => {
     
         put(`/order/cancel/${idCancelation}/accept`);
     }
-
+ 
     async function setSelected(){
         var options = document.getElementsByName('option');
         let reason = (await get(`/order/${props.code}/cancel/reason`))[0];
+        console.log(reason)
         setIdCancelation(reason["id"])
         reason = reason["name"]
 
@@ -80,13 +81,15 @@ export const OrderListItem = (props) => {
         }
         fetchData();
     },[]);
-
     return (
 <div id= "orderListItem">
     <label id ={`state${props.code}`}>{props.state}</label>
     <div id="order">
         <div id="orderImgList">
-            <p className="info" id="date">{props.date}</p> 
+            <p className="info" id="date">Recibido: <br/> {props.date.substring(0, 10)}</p>
+            {props.delivered && (<>
+                <p className="info" id="date">Entregado:<br/> {props.delivered.substring(0, 10)}</p>
+            </>)} 
             <img src={props.image} alt="Design"></img>
             <p>Telefono: {props.phone}</p>
             <p>Codigo {props.code}</p>
@@ -107,7 +110,7 @@ export const OrderListItem = (props) => {
                         </div>
                         <div className="option">
                             <input type="radio"  name="option" value="2"/>
-                            <label for="2">Encontre una mejor oferta</label>
+                            <label for="2">Encontré una mejor oferta</label>
                         </div>
                         <div className="option">
                             <input type="radio" name="option" value="3"/>

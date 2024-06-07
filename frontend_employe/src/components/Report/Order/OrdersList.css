@@ -1,5 +1,10 @@
-.deliveredList button{
+#ordersReport{
     width: 95%;
     font-size:x-large;
     background-color:#B8F67B
+}
+
+ul{
+    padding-left: 0%;
+    margin: 0;
 }

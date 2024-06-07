@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { PaymentItem, ReportPDF } from "./../Index"
-import { get } from "../../endpoints"
+import { PaymentItem, ReportPDF } from "../../Index"
+import { get } from "../../../endpoints"
 import "./PaymentList.css"
 import Popup from "reactjs-popup"
 import { Label } from "recharts"

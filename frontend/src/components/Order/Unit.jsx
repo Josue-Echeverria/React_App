@@ -9,6 +9,22 @@ import { post } from "../../endpoints";
 let ORIGINAL = {}
 
 
+const ADULT_SIZES = ["XL","L","M","S"]
+const KID_SIZES = ["16","14","12","10","8"]
+
+function notifyPriceUpdate(idUnit, newSize){
+    const oldSize = ORIGINAL[idUnit]["size"]
+    
+    // If the old size changed from adult size to kid size or the other way around
+    if(!(oldSize in ADULT_SIZES && newSize in ADULT_SIZES)||
+        !(oldSize in KID_SIZES && newSize in KID_SIZES)){
+        alert("Recuerde que las tallas entre XL, L, M, S tienen un costo de 5000 colones y las tallas 16, 14, 12, 10, 8 tienen un costo de 4000 colones, por favor verifique el total para ver los cambios")
+        window.location.reload()
+    }else{
+        alert("Cambios guardados")
+    }
+
+}
 
 function disableButtons(div){
     let buttons = div.getElementsByTagName('button')
@@ -98,7 +114,7 @@ export const Unit = (props) => {
         disableButtons(buttonsDiv)
 
         await post(`/update/unit/${props.unitNumber}`, {size, description, neckType})
-        alert("Cambios guardados")
+        notifyPriceUpdate(props.unitNumber, size)
         childNodes[0].disabled = true
         childNodes[1].style.display = "flex"
         childNodes[2].style.display = "none"

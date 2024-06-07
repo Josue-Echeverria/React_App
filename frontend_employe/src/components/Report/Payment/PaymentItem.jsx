@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import "./PaymentItem.css"
 import Popup from "reactjs-popup"
-import { del, put } from "../../endpoints"
+import { del, put } from "../../../endpoints"
 
 let ORIGINAL = {}
 

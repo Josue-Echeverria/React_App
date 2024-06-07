@@ -38,7 +38,8 @@ export const OrderListItem = (props) => {
         }
         // Change the state 
         const state = "Cancelando"
-        put(`/update/${props.code}/state`, {state})
+        const userId = 1;
+        put(`/update/state/${props.code}`, {state, userId})
 
         // Send the cancelation petition
         let date = new Date();

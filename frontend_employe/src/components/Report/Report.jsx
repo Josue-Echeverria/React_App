@@ -10,7 +10,7 @@ function getPayments(){
 }
 
 function getOrders(){
-  window.location.replace(`http://localhost:3002/orders/delivered`)
+  window.location.replace(`http://localhost:3002/orders/report`)
 }
 
 export const Report = () => {

@@ -2,7 +2,14 @@ import React from "react";
 
 export const Home = () => {
 
-  return <div>
+  return <div style={{
+    display: 'flex',
+    flexDirection: "column",
+    alignItems: 'center',
+    textAlign: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+  }}>
     <h2>Nuestra historia</h2>
     <p>
       En febrero, nació Empresa X con una visión clara: transformar la industria. Desde entonces, hemos estado comprometidos con la excelencia, la innovación y la satisfacción del cliente.

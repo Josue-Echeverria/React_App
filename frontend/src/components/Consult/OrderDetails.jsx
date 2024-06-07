@@ -17,7 +17,7 @@ let ORIGINAL = {}
  * It enables the input fields and shows the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-export function update(e){
+function update(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   ORIGINAL["phoneInput"] = document.querySelector("#phoneInput").value
@@ -36,10 +36,11 @@ export function update(e){
  * It restores the original values and hides the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-export function cancelUpdate(e){
+function cancelUpdate(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
-  childNodes[0].value = ORIGINAL[parentNode.id]
+  console.log(ORIGINAL)
+  childNodes[0].value = ORIGINAL[childNodes[0].id]
   ORIGINAL = {}
 
   childNodes[0].disabled = true
@@ -54,7 +55,7 @@ export function cancelUpdate(e){
  * It sends a POST request to update the client information and then disables the input fields and hides the save and cancel buttons.
  * @param {Event} e - The event object.
  */
-export async function saveUpdate(e){
+async function saveUpdate(e){
   const parentNode = e.target.parentNode
   const childNodes = parentNode.childNodes
   let phone = document.querySelector("#phoneInput").value
@@ -79,8 +80,14 @@ export const OrderDetails = () => {
   const [secondPaymentReceived, setSecondPaymentReceived] = useState(null); 
   const [firstPaymentReceived, setFirstPaymentReceived] = useState(null); 
   const [inputImgSecondPayment, setinputImgSecondPayment] = useState(null); 
-  const handleChange = (event) => {
+  const handleChangeName = (event) => {
     setData({...data, name: event.target.value}); // update state when input changes
+  };
+  const handleChangePhone = (event) => {
+    setData({...data, phone: event.target.value}); // update state when input changes
+  };
+  const handleChangeDirection = (event) => {
+    setData({...data, direction: event.target.value}); // update state when input changes
   };
 
   useEffect(() => {
@@ -96,6 +103,7 @@ export const OrderDetails = () => {
         order["imgDesign"] = (await get(`/image/${order["idImgDesign"]}`))[0]["image"]
         order["imgFirstPayment"] = (await get(`/image/${order["idImgFirstPayment"]}`))[0]["image"]
 
+        // Verifies the payments the client has done
         const payments = (await get(`/payment/${code}`))
         if(payments.length === 0){
           setFirstPaymentReceived(false)
@@ -116,7 +124,7 @@ export const OrderDetails = () => {
               }
             }
           } 
-        }
+        } 
         if(order["state"] === "Cancelando" || order["state"] === "Cancelada"){
           setOrderCanceling(true);
         }else
@@ -153,7 +161,7 @@ export const OrderDetails = () => {
     <div className="question">
       <label>Nombre:</label>
       <div className="data" id="name">
-        <input value={data.name} onChange={handleChange}  disabled={true} id="nameInput"/> 
+        <input value={data.name} onChange={handleChangeName}  disabled={true} id="nameInput"/> 
         {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
@@ -162,7 +170,7 @@ export const OrderDetails = () => {
     <div className="question">
       <label>Número:</label>
       <div className="data" id="phone">
-        <input value={data.phone} onChange={handleChange} disabled={true} id="phoneInput"/> 
+        <input value={data.phone} onChange={handleChangePhone} disabled={true} id="phoneInput"/> 
         {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>
@@ -171,7 +179,7 @@ export const OrderDetails = () => {
     <div className="question">
       <label>Dirección:</label>
       <div className="data" id="direction">
-        <input value={data.direction} onChange={handleChange} disabled id="directionInput"/> 
+        <input value={data.direction} onChange={handleChangeDirection} disabled id="directionInput"/> 
         {orderCanceling ? (<></>):(<i class="fa-solid fa-pen" onClick={update}></i>)}
         <i class="fa-solid fa-check" onClick={saveUpdate}></i>
         <i class="fa-solid fa-xmark" onClick={cancelUpdate}></i>

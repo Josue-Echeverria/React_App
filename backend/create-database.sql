@@ -365,8 +365,10 @@ AS
 BEGIN
 SET NOCOUNT ON;
     DECLARE @idClient INT;
+    DECLARE @idOrder INT;
     DECLARE @idNeckType INT;
     DECLARE @idSize INT;
+    DECLARE @inOldSize VARCHAR(5);
     
     SELECT @idSize = id
     FROM dbo.[size]
@@ -375,6 +377,31 @@ SET NOCOUNT ON;
     SELECT @idNeckType = id
     FROM dbo.[neckType]
     WHERE name = @inNewNecktType
+
+    SELECT @inOldSize = s.name
+    FROM dbo.[size] s
+    INNER JOIN unit u ON u.idSize = s.id
+
+    SELECT @idOrder = o.id
+    FROM dbo.[order] o
+    INNER JOIN dbo.unit u ON u.idOrder = o.id
+    WHERE u.id = @inId;
+
+    IF @inOldSize IN ('XL', 'L', 'M', 'S') 
+    AND @inNewSize IN ('16', '14', '12', '10', '8')
+        BEGIN
+            UPDATE dbo.[order]
+            SET total = total - 1000
+            WHERE id = @idOrder
+        END;
+    IF @inOldSize IN ('16', '14', '12', '10', '8') 
+    AND @inNewSize IN ('XL', 'L', 'M', 'S') 
+        BEGIN
+            UPDATE dbo.[order]
+            SET total = total + 1000
+            WHERE id = @idOrder
+        END;
+
 
     UPDATE dbo.unit
     SET idSize = @idSize
@@ -440,11 +467,6 @@ SET NOCOUNT ON;
     DELETE FROM dbo.[order]
     WHERE @inId = id;
 
-    -- DELETE 
-    -- FROM dbo.[image] 
-    -- WHERE @idImgDesign = id 
-    -- OR @idImgFirstPayment = id
-    -- OR @idImgSecondPayment = id;
 
     SELECT * 
     FROM dbo.[image] 
@@ -600,7 +622,7 @@ END;
 
 GO
 
-ALTER PROCEDURE [dbo].[change_state]
+CREATE PROCEDURE [dbo].[change_state]
     @inName VarChar(32) 
     ,@inIdOrder Int 
     ,@inUserId Int 
@@ -968,6 +990,50 @@ SET NOCOUNT OFF;
 END;
 
 GO
+
+CREATE PROCEDURE [dbo].[read_order_date_range]
+	@outResultCode INT OUTPUT
+    , @inStart DATE
+    , @inEnd DATE
+AS
+BEGIN
+SET NOCOUNT ON;
+    DECLARE @idDelivered INT;
+    DECLARE @idCanceled INT;
+    
+    SELECT @idDelivered = id 
+    FROM dbo.[state] 
+    WHERE name = 'Entregado';
+    
+    SELECT @idCanceled = id 
+    FROM dbo.[state] 
+    WHERE name = 'Cancelada';
+
+    SELECT a.id
+    , c.phone
+    , a.date
+    , i.[image]
+    , a.quantity
+    , a.total
+    , b.[date] AS delivered
+    , s.name AS state
+    FROM dbo.[order] a
+    INNER JOIN dbo.[client] c ON a.idClient = c.id
+    INNER JOIN dbo.[state] s ON a.idState = s.id
+    INNER JOIN dbo.[image] i ON i.id = a.idImgDesign
+    LEFT JOIN dbo.stateChangeOrder b ON a.id = b.idOrder AND b.idNewState = @idDelivered
+    WHERE a.idState != @idCanceled
+    AND a.[date] >= @inStart
+    AND a.[date] <= @inEnd
+    AND c.active = 1;
+
+    SET @outResultCode=0;
+SET NOCOUNT OFF;
+END;
+
+GO
+
+
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- Data

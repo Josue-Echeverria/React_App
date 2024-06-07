@@ -10,7 +10,7 @@ export const OrderList = () => {
     const fetchData = async () => {
       
       try {
-        const response = await get("/orders")
+        const response = await get("/orders_pending")
         const jsonData = await response
         setData(jsonData); 
       } catch (error) {
