@@ -6,20 +6,22 @@ Integrantes:
 
 ## Librerias
 
-- **SQLAlchemy**: Es una herramienta que controla cuántas conexiones a la base de datos pueden existir al mismo tiempo, cuántas pueden ser creadas de forma dinámica cuando el pool alcanza su capacidad máxima, y cuánto tiempo pueden vivir esas conexiones antes de cerrarse o reciclarse.
+- ### **SQLAlchemy**: 
+Es una herramienta que controla cuántas conexiones a la base de datos pueden existir al mismo tiempo, cuántas pueden ser creadas de forma dinámica cuando el pool alcanza su capacidad máxima, y cuánto tiempo pueden vivir esas conexiones antes de cerrarse o reciclarse.
 
-- **psycopg2**: Es un adaptador para conectar aplicaciones Python a bases de datos PostgreSQL. Ofrece connection pooling para gestionar eficientemente las conexiones, permitiendo gestionar cuántas conexiones pueden existir al mismo tiempo. Crea nuevas conexiones dinámicamente si todas están ocupadas
+- ### **psycopg2**: 
+Es un adaptador para conectar aplicaciones Python a bases de datos PostgreSQL. Ofrece connection pooling para gestionar eficientemente las conexiones, permitiendo gestionar cuántas conexiones pueden existir al mismo tiempo. Crea nuevas conexiones dinámicamente si todas están ocupadas
 
-### Parámetros configurables:
+#### Parámetros configurables:
 
 1. **minconn**: Número mínimo de conexiones que el pool debe mantener abiertas. Esto asegura que siempre haya un número mínimo de conexiones disponibles para ser reutilizadas. (Aunque se use menos conexiones de las minimas, psycopg2 siempre mantiene abiertas las minimas) 
 2. **maxconn**:  Número máximo de conexiones que el pool puede abrir. Esto limita la cantidad de conexiones simultáneas para evitar sobrecar
 
-## Bondades
+#### Bondades
 
 - **Multiples formas de conexion**: psycopg2 provee 4 clases para manejar las conexiones y hasta se puede utilizar la clase abstracta para crear nuevas conexiones a nuestro gusto.
 
-### **SimpleConnectionPool**:
+##### **SimpleConnectionPool**:
 Esta clase es adecuada solo para aplicaciones de un solo hilo.
 
 ```python
@@ -44,7 +46,7 @@ results = cursor.fetchall() # Se obtiene un array con el resultado
 ```
 
 
-### **AbstractConnectionPool**: 
+##### **AbstractConnectionPool**: 
 Si desea crear una implementación personalizada para el grupo de conexiones, puede ampliar esta clase e implementar sus métodos.
 
 ```python
@@ -96,7 +98,7 @@ custom_pool.putconn(conn)
 
 ```
 
-### **ThreadedConnectionPool**:
+##### **ThreadedConnectionPool**:
 Como su nombre indica, esta clase se utiliza en un entorno con multiples hilos de ejecucion. Es decir, el grupo de conexiones creado con esta clase se puede compartir entre varios subprocesos.
 
 ```python
@@ -141,7 +143,7 @@ for thread in threads:
 
 ```
 
-### **PersistentConnectionPool**: 
+##### **PersistentConnectionPool**: 
 Esta clase se utiliza en la aplicación multihilo, donde un grupo asigna conexiones persistentes a diferentes subprocesos, estas conexiones se mantienen abiertas. Cada subproceso obtiene una sola conexión del grupo, es decir, el subproceso no puede usar más de una conexión del grupo.
 
 ```python
@@ -157,18 +159,16 @@ persistent_pool = PersistentConnectionPool(
 )
 ```
 
-## Problema o limitante:
+#### Problema o limitante:
 
 - **Falta de reciclaje de conexiones**:Psycopg2 no recicla automáticamente las conexiones que ya no se utilizan. Esto puede llevar a un uso ineficiente de los recursos, ya que las conexiones inactivas permanecen abiertas y ocupan memoria y otros recursos del sistema.
 
 - **Solo para PostgreSQL**: Psycopg2 está diseñado específicamente para trabajar con bases de datos PostgreSQL. No es compatible con otros sistemas de gestión de bases de datos.
 
-- **aiomysql** o **aiopg**:  Son ibrerías que ayudan a manejar conexiones a bases de datos MySQL y PostgreSQL de manera asincrónica en Python. Permiten que las aplicaciones puedan realizar operaciones con la base de datos sin bloquear el flujo asincrónico, lo cual es ideal para entornos de alta concurrencia
+- ### **aiomysql** o **aiopg**:  
+Son ibrerías que ayudan a manejar conexiones a bases de datos MySQL y PostgreSQL de manera asincrónica en Python. Permiten que las aplicaciones puedan realizar operaciones con la base de datos sin bloquear el flujo asincrónico, lo cual es ideal para entornos de alta concurrencia
 
-
-## Parametros SQLAlchemy
-
-### Parámetros configurables:
+#### Parámetros configurables:
 1. **poolclass**: Permite especificar una clase personalizada para gestionar el pool de conexiones. Puedes usar diferentes tipos de pools, como NullPool (sin pool), StaticPool, o QueuePool.
 - NullPool: No utiliza ningún tipo de connection pooling. Esto significa que cada vez que se necesita una conexión, se abre una nueva conexión y se cierra tan pronto como se termina de usarla.
 -  StaticPool: Reutiliza una única conexión en todas las operaciones de la base de datos. Esto significa que, en lugar de crear múltiples conexiones, todas las solicitudes utilizan la misma conexión.
@@ -179,7 +179,7 @@ persistent_pool = PersistentConnectionPool(
 4. **pool_timeout**: Indica el tiempo máximo que la aplicación esperará para obtener una conexión del pool. Si se excede este tiempo, la operación fallará y lanzará una excepción.
 5. **pool_recycle**: Establece el número de segundos después de los cuales una conexión es reciclada, es decir, cerrada y reemplazada por una nueva.
 
-## Código de Ejemplo
+#### Código de Ejemplo
 
 ```python
 
@@ -208,12 +208,12 @@ with engine.connect() as connection:
 
 ```
 
-## Bondades
+#### Bondades
 
 - **Optimización de recursos**: Al usar un pool de conexiones, no es necesario crear una nueva conexión cada vez que la aplicación necesite acceso a la base de datos, lo que ahorra tiempo y recursos del sistema.
 
 - **Escalabilidad dinámica**: SQLAlchemy permite que el tamaño del pool crezca dinámicamente cuando hay más demanda, lo que ayuda que se pueda manejar picos de tráfico sin comprometer la estabilidad de la aplicación.
 
-## Problema o limitante
+#### Problema o limitante
 
 **Manejo de entornos asíncronos**: SQLAlchemy no tiene soporte nativo para entornos asíncronos. Si se esta desarrollando una aplicación basada en async, es necesario usar librerías adicionales, como asyncpg o aiomysql, lo cual introduce más complejidad al código.
