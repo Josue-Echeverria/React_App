@@ -11,6 +11,171 @@ Integrantes:
 - **psycopg2**: Es un adaptador para conectar aplicaciones Python a bases de datos PostgreSQL. Ofrece connection pooling para gestionar eficientemente las conexiones, permitiendo gestionar cuántas conexiones pueden existir al mismo tiempo. Crea nuevas conexiones dinámicamente si todas están ocupadas
 
 
+### Parámetros configurables:
+
+1. **minconn**: Número mínimo de conexiones que el pool debe mantener abiertas. Esto asegura que siempre haya un número mínimo de conexiones disponibles para ser reutilizadas. (Aunque se use menos conexiones de las minimas, psycopg2 siempre mantiene abiertas las minimas) 
+2. **maxconn**:  Número máximo de conexiones que el pool puede abrir. Esto limita la cantidad de conexiones simultáneas para evitar sobrecar
+
+## Bondades
+
+- **Multiples formas de conexion**: psycopg2 provee 4 clases para manejar las conexiones y hasta se puede utilizar la clase abstracta para crear nuevas conexiones a nuestro gusto.
+
+- - **AbstractConnectionPool**: Si desea crear una implementación personalizada para el grupo de conexiones, puede ampliar esta clase e implementar sus métodos.
+
+### Código de Ejemplo
+
+```python
+
+# Se puede crear otra clases a partir de la clase abstracta
+class CustomConnectionPool(psycopg2.pool.AbstractConnectionPool):
+    def __init__(self, minconn, maxconn, *args, **kwargs):
+        super().__init__(minconn, maxconn, *args, **kwargs)
+
+    def _connect(self, key=None): 
+        try:# Por lo que se puede sobrescribir las funciones de conexion
+            conn = psycopg2.connect(*self._args, **self._kwargs)
+            print("Connection established")
+            return conn
+        except psycopg2.DatabaseError as e:
+            print(f"Error connecting to database: {e}")
+            raise
+
+    def _disconnect(self, conn):
+        conn.close()
+    
+    # Y tambien se puede agregar funciones a la clase personalizada
+    def check_connections(self):
+        for conn in self._used:
+            if conn.closed:
+                print("Connection closed")
+            else:
+                print("Connection open")
+
+# Se puede conectar a la conexion personalizada como una conexion comun
+custom_pool = CustomConnectionPool(
+    minconn=1,
+    maxconn=10,
+    user='postgres',
+    password='test123',
+    host='localhost',
+    port='5432',
+    database='test'
+)
+conn = custom_pool.getconn()
+
+# Y usar la conexión personalizada como una conexion comun
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM tu_tabla;")
+records = cursor.fetchall()
+
+# Liberar la conexión de vuelta al pool
+custom_pool.putconn(conn)
+
+```
+
+- - **SimpleConnectionPool**: Esta clase es adecuada solo para aplicaciones de un solo hilo.
+
+### Código de Ejemplo
+
+```python
+
+pool = psycopg2.pool.SimpleConnectionPool( 
+	  minconn=2 # Minimo de conexiones que se pueden mantener activas
+	, maxconn=3 # Maximas conexiones que se pueden realizar al pool
+	, user='postgres'
+	, password='test123'
+	, host='localhost'
+	, port='5432'
+	, database='test') 
+
+# Se saca una conexion del pool
+connection1 = pool.getconn() 
+
+# Se usa la conexion
+cursor = connection1.cursor() 
+cursor.execute('SELECT * FROM person ORDER BY id') 
+
+results = cursor.fetchall() # Se obtiene un array con el resultado
+```
+
+- - **ThreadedConnectionPool**:Como su nombre indica, esta clase se utiliza en un entorno con multiples hilos de ejecucion. Es decir, el grupo de conexiones creado con esta clase se puede compartir entre varios subprocesos.
+
+### Código de Ejemplo
+
+```python
+
+threaded_pool = psycopg2.pool.ThreadedConnectionPool(
+    minconn=1, # Minimo de conexiones que se pueden mantener activas
+    maxconn=10,# Maximas conexiones que se pueden realizar al pool
+    user='postgres',
+    password='test123',
+    host='localhost',
+    port='5432',
+    database='test'
+)
+
+# Obtener una conexión del pool
+conn = threaded_pool.getconn()
+
+def worker(thread_id): #Funcion de ejemplo
+    # Obtener una conexión del pool
+    conn = threaded_pool.getconn()
+    if conn:
+        # Usar la conexión
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tu_tabla;")
+        records = cursor.fetchall()# Se obtiene un array con el resultado
+
+        # Liberar la conexión de vuelta al pool
+        threaded_pool.putconn(conn)
+
+
+# Crear y lanzar threads
+threads = []
+for i in range(5):
+    # Se utiliza la Funcion de ejemplo en el thread 
+    thread = threading.Thread(target=worker, args=(i,))
+    threads.append(thread)
+    thread.start()
+
+# Esperar a que todos los threads terminen
+for thread in threads:
+    thread.join()
+
+```
+
+- - **PersistentConnectionPool**: Esta clase se utiliza en la aplicación multihilo, donde un grupo asigna conexiones persistentes a diferentes subprocesos, estas conexiones se mantienen abiertas. Cada subproceso obtiene una sola conexión del grupo, es decir, el subproceso no puede usar más de una conexión del grupo.
+
+
+### Código de Ejemplo
+
+```python
+# Configuración del pool de conexiones persistentes
+persistent_pool = PersistentConnectionPool(
+    minconn=1,
+    maxconn=10,
+    user='tu_usuario',
+    password='tu_contraseña',
+    host='tu_host',
+    port='tu_puerto',
+    database='tu_base_de_datos'
+)
+
+# Usar la conexión
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM tu_tabla;")
+records = cursor.fetchall()  # Se obtiene un array con el resultado
+            
+persistent_pool.putconn(conn)
+```
+
+## Problema o limitante:
+
+**Falta de reciclaje de conexiones**:Psycopg2 no recicla automáticamente las conexiones que ya no se utilizan. Esto puede llevar a un uso ineficiente de los recursos, ya que las conexiones inactivas permanecen abiertas y ocupan memoria y otros recursos del sistema.
+
+**Solo para PostgreSQL**: Psycopg2 está diseñado específicamente para trabajar con bases de datos PostgreSQL. No es compatible con otros sistemas de gestión de bases de datos.
+
+
 - **aiomysql** o **aiopg**:  Son ibrerías que ayudan a manejar conexiones a bases de datos MySQL y PostgreSQL de manera asincrónica en Python. Permiten que las aplicaciones puedan realizar operaciones con la base de datos sin bloquear el flujo asincrónico, lo cual es ideal para entornos de alta concurrencia
 
 
